@@ -4,10 +4,13 @@
 <head>
     <title>Mapa</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css"/>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        #map { height: 500px; width: 100%; }
+        #map {
+            height: 500px;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -21,8 +24,9 @@
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    var wmsLayer = L.tileLayer.wms("http://seu-geoserver-url/wms", {
-        layers: 'your_layer_name', // Substitua pelo nome da camada WMS
+    // URL para o serviço WMS do GeoServer (local)
+    var wmsLayer = L.tileLayer.wms("http://localhost:8080/geoserver/ows", {
+        layers: 'tiger:giant_polygon', // Substitua pelo nome da camada WMS no GeoServer
         format: 'image/png',
         transparent: true
     }).addTo(map);

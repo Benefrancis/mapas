@@ -8,6 +8,16 @@ volumes:
     name: backend_mapas
   cache_maven:
     name: cache_maven
+  geoserver_data:
+    name: geoserver_data
+
+  pg_data:
+  logs:
+  datadir:
+  gwc_config:
+  gwc:
+  netcfd:
+  grib_cache:
 
 networks:
   mapas_net:
@@ -45,7 +55,9 @@ services:
     env_file:
       - .env
     build:
-      context: .
+      dockerfile:
+        Dockerfile
+    image: benefrancis/mapas
     container_name: api
     deploy:
       resources:
@@ -72,3 +84,37 @@ services:
     networks:
       - mapas_net
     restart: always
+
+  geoserver:
+    image: geosolutionsit/geoserver # Usando o repositório oficial no Docker Hub
+    container_name: geoserver
+    restart: always
+    environment:
+      POSTGRES_JNDI_ENABLED: true
+      POSTGRES_HOST: mapas_db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: mapas
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: postgres
+      GEOSERVER_ADMIN_USERNAME: "admin"
+      GEOSERVER_ADMIN_PASSWORD: "geoserver"
+      GEOSERVER_LOG_DIR: /var/log/geoserver
+      GEOSERVER_DATA_DIR: /var/lib/geoserver_data
+      GEOWEBCACHE_CONFIG_DIR: /var/lib/geowebcache/config
+      GEOWEBCACHE_CACHE_DIR: /var/lib/geowebcache/cache
+      NETCDF_DATA_DIR: /var/lib/netcdf
+      GRIB_CACHE_DIR: /var/lib/grib
+    volumes:
+      - logs:/var/log/geoserver
+      - datadir:/var/lib/geoserver_data
+      - gwc_config:/var/lib/geowebcache/config
+      - gwc:/var/lib/geowebcache/cache
+      - netcfd:/var/lib/netcdf
+      - grib_cache:/var/lib/grib
+    ports:
+      - "8080:8080"
+    networks:
+      - mapas_net
+    depends_on:
+      - mapas_db
+    command: [ "catalina.sh", "run" ]

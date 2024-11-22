@@ -5,8 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.View;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,14 +17,16 @@ import java.util.Map;
 public class MapController {
 
 
-
     private static final Logger log = LoggerFactory.getLogger(MapController.class);
 
-    @GetMapping("/")
-    public ModelAndView showMap() {
+
+    @GetMapping(value = {"", "/", "/index.html", "/index"})
+    public ModelAndView getSite(Model model) {
         log.info("Usuário acessando o site");
         // Criar ModelAndView com caminho relativo
-        ModelAndView mv = new ModelAndView("index"); // Caminho simplificado, já considerando o prefixo configurado
+        ModelAndView mv = new ModelAndView("index");
+        mv.addObject("model", model);
+        // Caminho simplificado, já considerando o prefixo configurado
         return mv;
     }
 

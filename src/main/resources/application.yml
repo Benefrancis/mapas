@@ -9,22 +9,22 @@ spring:
     active: ${PROFILE}
 
   thymeleaf:
-    check-template-location: true
+    enabled: true
     prefix: classpath:/templates/
     suffix: .html
+    mode: HTML
     cache: false
-
-
-
+    encoding: UTF-8
+    template-resolver-order: 1
+    servlet:
+      content-type: text/html
 
   web:
     locale-resolver: accept_header
     locale: pt_BR
 
-
   config:
     import: optional:file:.env[.properties]
-
 
 logging:
   level:

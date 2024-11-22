@@ -6,6 +6,7 @@ spring:
     url: jdbc:postgresql://${POSTGRES_SERVER:mapas_db}:${POSTGRES_PORT:5432}/${POSTGRES_NAME:mapas}
     username: ${POSTGRES_USERNAME:postgres}
     password: ${POSTGRES_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
     hikari:
       minimum-idle: 5           # Número mínimo de conexões inativas
       maximum-pool-size: 20     # Número máximo de conexões no pool
