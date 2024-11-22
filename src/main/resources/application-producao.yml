@@ -1,0 +1,30 @@
+spring:
+
+
+  #Configuração de Conexão com Banco de Dados
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_SERVER:mapas_db}:${POSTGRES_PORT:5432}/${POSTGRES_NAME:mapas}
+    username: ${POSTGRES_USERNAME:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    hikari:
+      minimum-idle: 5           # Número mínimo de conexões inativas
+      maximum-pool-size: 20     # Número máximo de conexões no pool
+      idle-timeout: 30000       # Tempo ocioso antes de liberar conexões (30 segundos)
+      max-lifetime: 1740000     # Tempo máximo de vida da conexão (29 minutos)
+      connection-timeout: 25000 # Tempo máximo para obter conexão (25 segundos)
+      pool-name: HikariPool-1
+      connection-test-query: SELECT 1
+      auto-commit: on
+      isolate-internal-queries: on
+
+  #Configuração de Mapeamento Objeto Relacional
+  jpa:
+    show_sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        hbm2ddl:
+          auto: update
+        default_batch_fetch_size: 10
+        generate-ddl: true

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Mapa</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #map { height: 500px; width: 100%; }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script>
+
+    var map = L.map('map').setView([-23.5505, -46.6333], 13); // Coordenadas iniciais
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var wmsLayer = L.tileLayer.wms("http://seu-geoserver-url/wms", {
+        layers: 'your_layer_name', // Substitua pelo nome da camada WMS
+        format: 'image/png',
+        transparent: true
+    }).addTo(map);
+
+    var marker = L.marker([-23.5505, -46.6333]).addTo(map); // Marcador inicial
+
+    function updatePosition() {
+        $.ajax({
+            url: "/update-position",
+            success: function(data) {
+                var lat = data.latitude;
+                var lon = data.longitude;
+                marker.setLatLng([lat, lon]);
+                map.panTo([lat, lon]);
+            }
+        });
+    }
+
+    setInterval(updatePosition, 5000); // Atualiza a posição a cada 5 segundos
+</script>
+</body>
+</html>
