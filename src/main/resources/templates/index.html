@@ -27,8 +27,8 @@
     // URL para o serviço WMS do GeoServer (local)
     var wmsLayer = L.tileLayer.wms("http://localhost:8080/geoserver/ows", {
         layers: 'tiger:giant_polygon', // Substitua pelo nome da camada WMS no GeoServer
-        format: 'image/png',
-        transparent: true
+        // format: 'image/png',
+        // transparent: true
     }).addTo(map);
 
     var marker = L.marker([-23.5505, -46.6333]).addTo(map); // Marcador inicial
