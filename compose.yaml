@@ -1,3 +1,4 @@
+version: "3.8"
 volumes:
   grafana_data:
   logs:
@@ -13,18 +14,16 @@ networks:
     name: net
     driver: bridge
 
-
 services:
-
 
   api:
     env_file:
       - .env
     build:
-      dockerfile:
-        Dockerfile
-    image: benefrancis/mapas
-    container_name: api
+      context: .
+      dockerfile: Dockerfile
+    image: benefrancis/mapas:latest
+    container_name: api4${CONTAINER_NAME:-} # Utilizando a variável de ambiente e um valor padrão caso ela não exista
     deploy:
       resources:
         limits:
@@ -32,10 +31,10 @@ services:
     ports:
       - ${SERVER_PORT:-80}:${SERVER_PORT:-80}
     depends_on:
-      - mapas_db
+      - db
     environment:
       JAVA_OPTS: -Xms1g -Xmx2g
-      POSTGRES_SERVER: mapas_db
+      POSTGRES_SERVER: db
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
       POSTGRES_NAME: ${POSTGRES_NAME:-mapas}
       POSTGRES_USERNAME: ${POSTGRES_USERNAME:-postgres}
@@ -45,18 +44,24 @@ services:
       - ./src/main/resources/static:/static
       - logs:/data/logs/mapas
       - backend_mapas:/assets
-    command: mvn clean package -DskipTests
+    command: java -jar /app.jar # Comando para iniciar sua aplicação
     networks:
       - net
     restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:${SERVER_PORT:-80}/actuator/health" ] #Healthcheck para sua aplicação
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   geoserver:
     image: geosolutionsit/geoserver:2.26.x
-    container_name: geoserver
+    container_name: geoserver4${CONTAINER_NAME:-}  # Utilizando a variável de ambiente e um valor padrão caso ela não exista
     restart: always
     environment:
       POSTGRES_JNDI_ENABLED: true
-      POSTGRES_HOST: mapas_db
+      POSTGRES_HOST: db
       POSTGRES_PORT: 5432
       POSTGRES_DB: mapas
       POSTGRES_USERNAME: postgres
@@ -81,7 +86,7 @@ services:
     networks:
       - net
     depends_on:
-      - mapas_db
+      - db
     command: [ "catalina.sh", "run" ]
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/geoserver/rest/about/status" ]
@@ -90,9 +95,9 @@ services:
       retries: 3
       start_period: 60s
 
-  mapas_db:
+  db:
     image: postgis/postgis:9.5-2.5
-    container_name: mapas_db
+    container_name: db4${CONTAINER_NAME:-} # Utilizando a variável de ambiente e um valor padrão caso ela não exista
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -111,9 +116,10 @@ services:
       retries: 3
       start_period: 60s
 
+
   rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
+    image: rabbitmq:4-management
+    container_name: rabbitmq4${CONTAINER_NAME:-}
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -121,16 +127,27 @@ services:
       - net
     volumes:
       - ./rabbitmq_setup.sh:/docker-entrypoint-initdb.d/rabbitmq_setup.sh
+      - ./erlang.config:/etc/rabbitmq/erlang.config
     healthcheck:
-      test: [ "CMD", "rabbitmq-diagnostics", "check_port", "15672" ]
+      test: [ "CMD", "curl", "-f", "-u", "rabitmq:rabitmq", "http://localhost:15672/api/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 60s
-
+    environment:
+      RABBITMQ_ADVANCED_CONFIG: |
+        [
+            {
+               deprecated_features,
+               [{permit,
+                [{management_metrics_collection, true}]
+                }]
+             }
+        ].
+      ERL_FLAGS: "+S 1 +K true +A30 +Bc16384 --enable-feature all"
   prometheus:
     image: prom/prometheus:v3.1.0
-    container_name: prometheus
+    container_name: prometheus4${CONTAINER_NAME:-}  # Utilizando a variável de ambiente e um valor padrão caso ela não exista
     ports:
       - "9090:9090"
     volumes:
@@ -147,7 +164,7 @@ services:
       start_period: 60s
   grafana:
     image: grafana/grafana:9.1.7
-    container_name: grafana
+    container_name: grafana4${CONTAINER_NAME:-}  # Utilizando a variável de ambiente e um valor padrão caso ela não exista
     ports:
       - "3000:3000"
     volumes:
@@ -162,4 +179,3 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-

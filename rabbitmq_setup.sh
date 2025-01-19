@@ -15,11 +15,12 @@ rabbitmqctl set_permissions -p mapas api ".*" ".*" ".*"
 
 rabbitmqctl add_user geoserver rabbitmq
 rabbitmqctl set_user_tags geoserver administrator
-rabbitmqctl set_permissions -p mapas geoserver_user ".*" ".*" ".*"
+rabbitmqctl set_permissions -p mapas geoserver ".*" ".*" ".*"
 
-rabbitmqctl add_user rabbitmq rabbitmq
-rabbitmqctl set_user_tags geoserver administrator
-rabbitmqctl set_permissions -p mapas rabbitmq ".*" ".*" ".*"
+# Defina o usuario para acesso web e conceda as permissões de administrador
+rabbitmqctl add_user web rabbitmq
+rabbitmqctl set_user_tags web administrator
+rabbitmqctl set_permissions -p mapas web ".*" ".*" ".*"
 
 # Cria Queues
 rabbitmqctl declare_queue -p mapas geoserver_queue true false {}
