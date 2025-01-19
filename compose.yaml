@@ -1,55 +1,21 @@
 volumes:
-  mapas_logs:
-    name: mapas_logs
-  pgdata_mapas:
-    name: pgdata_mapas
-    driver: local
-  backend_mapas:
-    name: backend_mapas
-  cache_maven:
-    name: cache_maven
-  geoserver_data:
-    name: geoserver_data
-
-  pg_data:
+  grafana_data:
   logs:
   datadir:
   gwc_config:
   gwc:
   netcfd:
   grib_cache:
-
+  data_pg:
+  backend_mapas:
 networks:
-  mapas_net:
-    name: mapas_net
+  net:
+    name: net
     driver: bridge
-    external: false
+
 
 services:
-  mapas_db:
-    image: ${POSTGRES_IMAGE:-postgis/postgis:latest}
-    container_name: mapas_db
-    restart: always
-    environment:
-      POSTGRES_USER: ${POSTGRES_USERNAME:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_NAME:-mapas}
-      PGDATA: /data/lib/postgresql/data/pgdata
-      POSTGRES_HOST_AUTH_METHOD: password
-    volumes:
-      - pgdata_mapas:/data/lib/postgresql/data/pgdata
-      - ./postgresql.conf:/etc/postgresql/postgresql.conf
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - ${DB_PORT:-5433}:5432
-    networks:
-      - mapas_net
-    command: [ "postgres", "-c", "config_file=/etc/postgresql/postgresql.conf" ]
-    deploy:
-      resources:
-        limits:
-          memory: 2g
-          cpus: "1.5"
+
 
   api:
     env_file:
@@ -77,16 +43,15 @@ services:
     volumes:
       - ./src/main/resources/templates:/templates
       - ./src/main/resources/static:/static
-      - mapas_logs:/data/logs/mapas
+      - logs:/data/logs/mapas
       - backend_mapas:/assets
-      - cache_maven:/root/.m2
     command: mvn clean package -DskipTests
     networks:
-      - mapas_net
+      - net
     restart: always
 
   geoserver:
-    image: geosolutionsit/geoserver # Usando o repositório oficial no Docker Hub
+    image: geosolutionsit/geoserver:2.26.x
     container_name: geoserver
     restart: always
     environment:
@@ -96,8 +61,8 @@ services:
       POSTGRES_DB: mapas
       POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: postgres
-      GEOSERVER_ADMIN_USERNAME: "admin"
-      GEOSERVER_ADMIN_PASSWORD: "geoserver"
+      GEOSERVER_ADMIN_USERNAME: "admin" # Troque esta senha
+      GEOSERVER_ADMIN_PASSWORD: "geoserver" # Troque esta senha
       GEOSERVER_LOG_DIR: /var/log/geoserver
       GEOSERVER_DATA_DIR: /var/lib/geoserver_data
       GEOWEBCACHE_CONFIG_DIR: /var/lib/geowebcache/config
@@ -114,7 +79,87 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - mapas_net
+      - net
     depends_on:
       - mapas_db
     command: [ "catalina.sh", "run" ]
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/geoserver/rest/about/status" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  mapas_db:
+    image: postgis/postgis:9.5-2.5
+    container_name: mapas_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mapas
+    ports:
+      - "5432:5432"
+    volumes:
+      - data_pg:/var/lib/postgresql/data
+    networks:
+      - net
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - net
+    volumes:
+      - ./rabbitmq_setup.sh:/docker-entrypoint-initdb.d/rabbitmq_setup.sh
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "check_port", "15672" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - net
+    depends_on:
+      - geoserver
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9090/-/healthy" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+  grafana:
+    image: grafana/grafana:9.1.7
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - net
+    depends_on:
+      - prometheus
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/api/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
