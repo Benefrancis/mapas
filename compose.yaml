@@ -22,7 +22,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: benefrancis/mapas:latest
+#    image: benefrancis/mapas:latest
     container_name: api4${CONTAINER_NAME:-} # Utilizando a variável de ambiente e um valor padrão caso ela não exista
     deploy:
       resources:
