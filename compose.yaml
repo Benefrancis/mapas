@@ -56,7 +56,7 @@ services:
       start_period: 60s
 
   geoserver:
-    image: geosolutionsit/geoserver:2.26.x
+    image: ${GEOSERVER_IMAGE:-geoserver/geoserver:2.22.0}
     container_name: geoserver4${CONTAINER_NAME:-}  # Utilizando a variável de ambiente e um valor padrão caso ela não exista
     restart: always
     environment:
@@ -66,8 +66,8 @@ services:
       POSTGRES_DB: mapas
       POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: postgres
-      GEOSERVER_ADMIN_USERNAME: "admin" # Troque esta senha
-      GEOSERVER_ADMIN_PASSWORD: "geoserver" # Troque esta senha
+      GEOSERVER_ADMIN_USERNAME: ${GEOSERVER_ADMIN_USERNAME:-admin}
+      GEOSERVER_ADMIN_PASSWORD: ${GEOSERVER_ADMIN_PASSWORD:-geoserver}
       GEOSERVER_LOG_DIR: /var/log/geoserver
       GEOSERVER_DATA_DIR: /var/lib/geoserver_data
       GEOWEBCACHE_CONFIG_DIR: /var/lib/geowebcache/config
@@ -116,7 +116,6 @@ services:
       retries: 3
       start_period: 60s
 
-
   rabbitmq:
     image: rabbitmq:4-management
     container_name: rabbitmq4${CONTAINER_NAME:-}
@@ -145,6 +144,8 @@ services:
              }
         ].
       ERL_FLAGS: "+S 1 +K true +A30 +Bc16384 --enable-feature all"
+
+
   prometheus:
     image: prom/prometheus:v3.1.0
     container_name: prometheus4${CONTAINER_NAME:-}  # Utilizando a variável de ambiente e um valor padrão caso ela não exista
