@@ -30,11 +30,14 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar /app/mapas.jar
 
 # Copiar recursos estáticos e templates de uma vez
-COPY src/main/resources/templates /app/templates
-COPY src/main/resources/static /app/static
+COPY src/main/resources/templates /app/src/main/resources/templates
+COPY src/main/resources/static /app/src/main/resources/static
 
 # Expor a porta 80
 EXPOSE 80
+
+# Defina o diretório app com permissão de execução
+RUN chmod +x /app
 
 # Comando para rodar a aplicação
 ENTRYPOINT ["java", "-jar", "/app/mapas.jar"]
