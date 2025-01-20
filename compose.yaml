@@ -22,7 +22,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-#    image: benefrancis/mapas:latest
+    image: benefrancis/mapas:latest
     container_name: api4${CONTAINER_NAME:-} # Utilizando a variável de ambiente e um valor padrão caso ela não exista
     deploy:
       resources:
@@ -44,7 +44,7 @@ services:
       - ./src/main/resources/static:/static
       - logs:/data/logs/mapas
       - backend_mapas:/assets
-    command: java -jar /app.jar # Comando para iniciar sua aplicação
+    command: java -jar /app/mapas.jar # Comando para iniciar sua aplicação
     networks:
       - net
     restart: always
@@ -56,18 +56,18 @@ services:
       start_period: 60s
 
   geoserver:
-    image: ${GEOSERVER_IMAGE:-geoserver/geoserver:2.22.0}
+    image: geosolutionsit/geoserver:2.26.x
     container_name: geoserver4${CONTAINER_NAME:-}  # Utilizando a variável de ambiente e um valor padrão caso ela não exista
     restart: always
     environment:
       POSTGRES_JNDI_ENABLED: true
-      POSTGRES_HOST: db
+      POSTGRES_HOST: db # ajuste para db, que é o nome do container na rede docker
       POSTGRES_PORT: 5432
       POSTGRES_DB: mapas
       POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: postgres
-      GEOSERVER_ADMIN_USERNAME: ${GEOSERVER_ADMIN_USERNAME:-admin}
-      GEOSERVER_ADMIN_PASSWORD: ${GEOSERVER_ADMIN_PASSWORD:-geoserver}
+      GEOSERVER_ADMIN_USERNAME: ${GEOSERVER_ADMIN_USERNAME:-admin} # Troque esta senha
+      GEOSERVER_ADMIN_PASSWORD: ${GEOSERVER_ADMIN_PASSWORD:-geoserver} # Troque esta senha
       GEOSERVER_LOG_DIR: /var/log/geoserver
       GEOSERVER_DATA_DIR: /var/lib/geoserver_data
       GEOWEBCACHE_CONFIG_DIR: /var/lib/geowebcache/config
@@ -75,12 +75,13 @@ services:
       NETCDF_DATA_DIR: /var/lib/netcdf
       GRIB_CACHE_DIR: /var/lib/grib
     volumes:
-      - logs:/var/log/geoserver
-      - datadir:/var/lib/geoserver_data
-      - gwc_config:/var/lib/geowebcache/config
-      - gwc:/var/lib/geowebcache/cache
-      - netcfd:/var/lib/netcdf
-      - grib_cache:/var/lib/grib
+      - ./logs:/var/log/geoserver
+      - ./datadir:/var/lib/geoserver_data
+      - ./gwc_config:/var/lib/geowebcache/config
+      - ./gwc:/var/lib/geowebcache/cache
+      - ./netcfd:/var/lib/netcdf
+      - ./grib_cache:/var/lib/grib
+      - ./context.xml:/opt/tomcat/conf/Catalina/localhost/geoserver.xml # mapeamento para o seu context.xml
     ports:
       - "8080:8080"
     networks:
@@ -97,7 +98,7 @@ services:
 
   db:
     image: postgis/postgis:9.5-2.5
-    container_name: db4${CONTAINER_NAME:-} # Utilizando a variável de ambiente e um valor padrão caso ela não exista
+    container_name: db4${CONTAINER_NAME:-}
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -115,6 +116,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+
 
   rabbitmq:
     image: rabbitmq:4-management
@@ -136,19 +138,12 @@ services:
     environment:
       RABBITMQ_ADVANCED_CONFIG: |
         [
-            {
-               deprecated_features,
-               [{permit,
-                [{management_metrics_collection, true}]
-                }]
-             }
+          {deprecated_features, [{permit, [{management_metrics_collection, true}]}]}
         ].
       ERL_FLAGS: "+S 1 +K true +A30 +Bc16384 --enable-feature all"
-
-
   prometheus:
     image: prom/prometheus:v3.1.0
-    container_name: prometheus4${CONTAINER_NAME:-}  # Utilizando a variável de ambiente e um valor padrão caso ela não exista
+    container_name: prometheus4${CONTAINER_NAME:-}
     ports:
       - "9090:9090"
     volumes:
@@ -165,7 +160,7 @@ services:
       start_period: 60s
   grafana:
     image: grafana/grafana:9.1.7
-    container_name: grafana4${CONTAINER_NAME:-}  # Utilizando a variável de ambiente e um valor padrão caso ela não exista
+    container_name: grafana4${CONTAINER_NAME:-}
     ports:
       - "3000:3000"
     volumes:
