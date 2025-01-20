@@ -1,0 +1,29 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'geoserver'
+    metrics_path: '/geoserver/actuator/prometheus'
+    static_configs:
+      - targets: ['geoserver:8080']
+
+  - job_name: 'rabbitmq'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['rabbitmq:15672']
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'grafana'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['grafana:3000']
+
+
+  - job_name: 'api'
+    metrics_path: '/actuator/prometheus' # Endpoint do Actuator
+    static_configs:
+      - targets: ['api:8081'] # Ajuste a porta se necessário

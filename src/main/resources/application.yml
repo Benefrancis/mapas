@@ -26,6 +26,22 @@ spring:
   config:
     import: optional:file:.env[.properties]
 
+
+
+# Prometheus Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+
+
+
 logging:
   level:
     root: INFO
