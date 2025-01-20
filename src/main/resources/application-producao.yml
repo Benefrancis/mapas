@@ -3,7 +3,7 @@ spring:
 
   #Configuração de Conexão com Banco de Dados
   datasource:
-    url: jdbc:postgresql://${POSTGRES_SERVER:mapas_db}:${POSTGRES_PORT:5432}/${POSTGRES_NAME:mapas}
+    url: jdbc:postgresql://${POSTGRES_SERVER:db}:${POSTGRES_PORT:5432}/${POSTGRES_NAME:mapas}
     username: ${POSTGRES_USERNAME:postgres}
     password: ${POSTGRES_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
