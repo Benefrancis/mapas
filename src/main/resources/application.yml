@@ -18,6 +18,7 @@ spring:
     template-resolver-order: 1
     servlet:
       content-type: text/html
+    check-template: true
 
   web:
     locale-resolver: accept_header
@@ -25,8 +26,6 @@ spring:
 
   config:
     import: optional:file:.env[.properties]
-
-
 
 # Prometheus Configuration
 management:
@@ -38,9 +37,6 @@ management:
     metrics:
       export:
         enabled: true
-
-
-
 
 logging:
   level:
