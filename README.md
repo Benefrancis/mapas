@@ -8,6 +8,30 @@ Este projeto é uma plataforma de mapas que utiliza diversas tecnologias para pr
 de dados geográficos, monitoramento e visualização. A arquitetura envolve um back-end Spring Boot, GeoServer, PostgreSQL
 com PostGIS, RabbitMQ para mensageria, Prometheus para monitoramento e Grafana para visualização de métricas.
 
+
+## Importanto dados de Shapfiles
+
+```shell
+shp2pgsql -c -D -s 4326 -I -W LATIN1 aldeias_pontos/aldeias_pontosPoint.shp mapas.aldeias_pontos | psql -U postgre
+s -d mapas
+
+shp2pgsql -c -D -s 4326 -I -W LATIN1 aldeias_pontos/aldeias_pontosPoint.shp mapas.tb_aldeias_pontos | psql -U post
+gres -d mapas
+
+shp2pgsql -c -D -s 4326 -I -W LATIN1 tis_amazonia_legal_poligonais/tis_amazonia_legal_poligonaisPolygon.shp mapas.
+tb_tis_amazonia_legal_poligonais | psql -U postgres -d mapas
+ 
+shp2pgsql -c -D -s 4326 -I -W LATIN1 tis_cr/tis_crPoint.shp mapas.tb_tis_cr_point | psql -U postgres -d mapas
+
+
+
+
+
+```
+
+
+
+
 ## Diagrama de Arquitetura
 
 ```mermaid
