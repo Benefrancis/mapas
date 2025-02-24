@@ -23,10 +23,6 @@ tb_tis_amazonia_legal_poligonais | psql -U postgres -d mapas
  
 shp2pgsql -c -D -s 4326 -I -W LATIN1 tis_cr/tis_crPoint.shp mapas.tb_tis_cr_point | psql -U postgres -d mapas
 
-
-
-
-
 ```
 
 
