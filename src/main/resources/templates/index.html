@@ -18,18 +18,22 @@
 
 <script>
 
-    var map = L.map('map').setView([-23.5505, -46.6333], 13); // Coordenadas iniciais
+    var map = L.map('map').setView([-23.5505, -46.6333], 7); // Coordenadas iniciais alterada escala
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    // URL para o serviço WMS do GeoServer (local)
-    var wmsLayer = L.tileLayer.wms("http://localhost:8080/geoserver/ows", {
-        layers: 'tiger:giant_polygon', // Substitua pelo nome da camada WMS no GeoServer
+    // URL para o serviço WMS do GeoServer
+    var wmsLayerUF = L.tileLayer.wms("http://localhost:8080/geoserver/mapas_brasil/wms", {
+        layers: 'mapas_brasil:tb_uf', // workspace:nome_da_camada
         format: 'image/png',
-        transparent: true
+        transparent: true,
+        version: '1.1.0',
+        tiled: true
     }).addTo(map);
+
+    // Adicione outras camadas WMS aqui (FUNAI, INCRA, etc.)
 
     var marker = L.marker([-23.5505, -46.6333]).addTo(map); // Marcador inicial
 

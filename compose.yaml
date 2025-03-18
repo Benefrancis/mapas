@@ -60,7 +60,7 @@ services:
     container_name: geoserver4${CONTAINER_NAME:-}  # Utilizando a variável de ambiente e um valor padrão caso ela não exista
     restart: always
     environment:
-      POSTGRES_JNDI_ENABLED: true
+      POSTGRES_JNDI_ENABLED: false
       POSTGRES_HOST: db # ajuste para db, que é o nome do container na rede docker
       POSTGRES_PORT: 5432
       POSTGRES_DB: mapas

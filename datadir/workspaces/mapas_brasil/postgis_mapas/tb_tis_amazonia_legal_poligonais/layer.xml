@@ -1,0 +1,16 @@
+<layer>
+  <name>tb_tis_amazonia_legal_poligonais</name>
+  <id>LayerInfoImpl-23d3d434:195a8b7c431:-7fec</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl-3d8b1ff4:194816aefa6:-7ffe</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl-23d3d434:195a8b7c431:-7fed</id>
+  </resource>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+  <dateCreated>2025-03-18 10:30:42.415 UTC</dateCreated>
+</layer>

@@ -1,0 +1,16 @@
+<layer>
+  <name>tb_quilombolas</name>
+  <id>LayerInfoImpl-23d3d434:195a8b7c431:-7fef</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl-3d8b1ff4:194816aefa6:-7ffe</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl-23d3d434:195a8b7c431:-7ff0</id>
+  </resource>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+  <dateCreated>2025-03-18 10:29:45.583 UTC</dateCreated>
+</layer>
