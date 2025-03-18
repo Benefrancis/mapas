@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Backup das tabelas
+/documentos_do_projeto/database/
+
