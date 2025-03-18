@@ -27,11 +27,11 @@
           <!-- like a linesymbolizer but with a fill too -->
           <PolygonSymbolizer>
             <Fill>
-              <CssParameter name="fill">#AAAAAA</CssParameter>
+              <CssParameter name="fill-opacity">0</CssParameter>
             </Fill>
             <Stroke>
-              <CssParameter name="stroke">#000000</CssParameter>
-              <CssParameter name="stroke-width">1</CssParameter>
+              <CssParameter name="stroke">#00FFFF</CssParameter>
+              <CssParameter name="stroke-width">2</CssParameter>
             </Stroke>
           </PolygonSymbolizer>
         </Rule>
