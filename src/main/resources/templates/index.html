@@ -11,20 +11,32 @@
             height: 500px;
             width: 100%;
         }
+        .layer-control {
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
 <div id="map"></div>
 
-<script>
+<div id="layer-controls">
+    <h2>Camadas</h2>
+    <div class="layer-control">
+        <label>
+            <input type="checkbox" id="uf-checkbox" checked> Unidades Federativas
+        </label>
+    </div>
+    <!-- Adicione controles para outras camadas aqui (FUNAI, INCRA, etc.) -->
+</div>
 
+<script>
     var map = L.map('map').setView([-23.5505, -46.6333], 7); // Coordenadas iniciais alterada escala
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    // URL para o serviço WMS do GeoServer
+    // Camada WMS para Unidades Federativas
     var wmsLayerUF = L.tileLayer.wms("http://localhost:8080/geoserver/mapas_brasil/wms", {
         layers: 'mapas_brasil:tb_uf', // workspace:nome_da_camada
         format: 'image/png',
@@ -33,7 +45,21 @@
         tiled: true
     }).addTo(map);
 
+    // Inicialmente, a camada está visível (checked no HTML)
+
     // Adicione outras camadas WMS aqui (FUNAI, INCRA, etc.)
+    // e armazene-as em variáveis
+
+    // Evento de clique no checkbox da camada UF
+    document.getElementById('uf-checkbox').addEventListener('change', function() {
+        if (this.checked) {
+            map.addLayer(wmsLayerUF); // Adiciona a camada ao mapa
+        } else {
+            map.removeLayer(wmsLayerUF); // Remove a camada do mapa
+        }
+    });
+
+    // Adicione lógica similar para os outros controles de camada
 
     var marker = L.marker([-23.5505, -46.6333]).addTo(map); // Marcador inicial
 
