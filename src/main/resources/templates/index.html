@@ -11,8 +11,17 @@
             height: 500px;
             width: 100%;
         }
+
+        #layer-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start; /* Alinha os itens à esquerda */
+            margin-bottom: 10px;
+        }
+
         .layer-control {
-            margin-bottom: 5px;
+            margin-right: 10px; /* Espaçamento entre os checkboxes */
+            margin-bottom: 5px;   /* Espaçamento abaixo dos checkboxes */
         }
     </style>
 </head>
@@ -20,48 +29,93 @@
 <div id="map"></div>
 
 <div id="layer-controls">
-    <h2>Camadas</h2>
-    <div class="layer-control">
-        <label>
-            <input type="checkbox" id="uf-checkbox" checked> Unidades Federativas
-        </label>
-    </div>
-    <!-- Adicione controles para outras camadas aqui (FUNAI, INCRA, etc.) -->
+    <!-- Os controles de camada serão gerados aqui dinamicamente -->
 </div>
 
 <script>
-    var map = L.map('map').setView([-23.5505, -46.6333], 7); // Coordenadas iniciais alterada escala
+    var map = L.map('map').setView([-23.5505, -46.6333], 7);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    // Camada WMS para Unidades Federativas
-    var wmsLayerUF = L.tileLayer.wms("http://localhost:8080/geoserver/mapas_brasil/wms", {
-        layers: 'mapas_brasil:tb_uf', // workspace:nome_da_camada
-        format: 'image/png',
-        transparent: true,
-        version: '1.1.0',
-        tiled: true
-    }).addTo(map);
+    // Função para buscar as camadas do GeoServer
+    function getLayersFromGeoServer() {
+        var geoserverURL = "http://localhost:8080/geoserver/rest/workspaces/mapas_brasil/layers.json";
+        var username = "admin";  // Substitua pelo seu usuário do GeoServer
+        var password = "geoserver"; // Substitua pela sua senha do GeoServer
 
-    // Inicialmente, a camada está visível (checked no HTML)
+        $.ajax({
+            url: geoserverURL,
+            type: "GET",
+            dataType: "json",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Authorization", "Basic " + btoa(username + ":" + password));
+            },
+            success: function (data) {
+                var layers = data.layers.layer;
+                createLayerControls(layers);
+            },
+            error: function (xhr, status, error) {
+                console.error("Erro ao buscar as camadas do GeoServer:", error);
+            }
+        });
+    }
 
-    // Adicione outras camadas WMS aqui (FUNAI, INCRA, etc.)
-    // e armazene-as em variáveis
+    // Função para criar os controles de camada dinamicamente
+    function createLayerControls(layers) {
+        var layerControlsDiv = document.getElementById('layer-controls');
 
-    // Evento de clique no checkbox da camada UF
-    document.getElementById('uf-checkbox').addEventListener('change', function() {
-        if (this.checked) {
-            map.addLayer(wmsLayerUF); // Adiciona a camada ao mapa
-        } else {
-            map.removeLayer(wmsLayerUF); // Remove a camada do mapa
-        }
+        layers.forEach(function (layer) {
+            var layerName = layer.name;
+            var layerTitle = layer.name; // Você pode buscar o título da camada separadamente, se precisar
+
+            // Cria o elemento checkbox
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = layerName + '-checkbox';
+            checkbox.checked = true; // Camada visível por padrão
+
+            // Cria o label para o checkbox
+            var label = document.createElement('label');
+            label.htmlFor = layerName + '-checkbox';
+            label.textContent = layerTitle;
+
+            // Cria o div para o controle de camada (checkbox + label)
+            var layerControlDiv = document.createElement('div');
+            layerControlDiv.classList.add('layer-control');
+            layerControlDiv.appendChild(checkbox);
+            layerControlDiv.appendChild(label);
+
+            // Adiciona o controle de camada ao div principal
+            layerControlsDiv.appendChild(layerControlDiv);
+
+            // Cria a camada WMS
+            var wmsLayer = L.tileLayer.wms("http://localhost:8080/geoserver/mapas_brasil/wms", {
+                layers: 'mapas_brasil:' + layerName,
+                format: 'image/png',
+                transparent: true,
+                version: '1.1.0',
+                tiled: true
+            }).addTo(map);  // Adiciona a camada ao mapa inicialmente
+
+            // Adiciona o event listener para o checkbox
+            checkbox.addEventListener('change', function () {
+                if (this.checked) {
+                    map.addLayer(wmsLayer);
+                } else {
+                    map.removeLayer(wmsLayer);
+                }
+            });
+        });
+    }
+
+    // Chama a função para buscar as camadas do GeoServer quando a página carregar
+    $(document).ready(function () {
+        getLayersFromGeoServer();
     });
 
-    // Adicione lógica similar para os outros controles de camada
-
-    var marker = L.marker([-23.5505, -46.6333]).addTo(map); // Marcador inicial
+    var marker = L.marker([-23.5505, -46.6333]).addTo(map);
 
     function updatePosition() {
         $.ajax({
@@ -75,7 +129,7 @@
         });
     }
 
-    setInterval(updatePosition, 5000); // Atualiza a posição a cada 5 segundos
+    setInterval(updatePosition, 5000);
 </script>
 </body>
 </html>
