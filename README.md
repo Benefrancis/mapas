@@ -23,6 +23,8 @@ tb_tis_amazonia_legal_poligonais | psql -U postgres -d mapas
  
 shp2pgsql -c -D -s 4326 -I -W LATIN1 tis_cr/tis_crPoint.shp mapas.tb_tis_cr_point | psql -U postgres -d mapas
 
+
+shp2pgsql -c -D -s 4326 -I -W LATIN1 quilombolas/Áreas de Quilombolas.shp mapas.tb_quilombolas | psql -U postgres -d mapas
 ```
 
 
@@ -185,3 +187,38 @@ Em desenvolvimento
 * Documentação do RabbitMQ: (Link para documentação)
 * Documentação do GeoServer: (Link para documentação)
 * Documentação do Spring Boot: (Link para documentação)
+
+
+
+
+```plantuml
+
+@startuml
+actor "Usuário do Sistema" as Usuario
+actor "Técnico" as Tecnico
+actor "Conselheiro Titular" as Conselheiro
+actor "Conselheiro Suplente" as Suplente
+actor "Sistema" as Sistema
+
+Usuario -> (Cadastrar Território)
+
+Sistema -> (Sortear Técnico para Avaliação)
+Sistema -> Tecnico : Notificar distribuição
+
+Tecnico -> (Emitir Parecer Técnico)
+
+Sistema -> (Notificar Técnico sobre Prazo)
+Sistema -> Tecnico : Enviar lembrete diário (últimos 5 dias)
+
+Sistema -> (Redistribuir Território para Novo Técnico)
+Sistema -> Tecnico : Redistribuir após 30 dias sem parecer
+
+Conselheiro -> (Votar no Território)
+Sistema -> (Aprovar Automaticamente ao Atingir Metade dos Votos)
+
+Sistema -> (Liberar Voto de Conselheiros Suplentes)
+Suplente -> (Votar no Território)
+
+@enduml
+
+```
