@@ -96,25 +96,8 @@ services:
       retries: 3
       start_period: 60s
 
-
-#  FROM postgis/postgis:15-3.3
-#
-#  # Muda para o usuário root para poder instalar pacotes
-#  USER root
-#
-#  # Atualiza os repositórios e reinstala os pacotes do postgis que garantem a disponibilidade do shp2pgsql
-#  RUN apt-get update && \
-#  apt-get --reinstall install -y postgis postgresql-15-postgis-3 && \
-#  rm -rf /var/lib/apt/lists/*
-#
-#  # Volta para o usuário postgres (opcional, mas recomendado)
-#  USER postgres
-
-
-
-
   db:
-    image: postgis/postgis:15-3.3
+    image: postgis/postgis:9.5-2.5
     container_name: db4${CONTAINER_NAME:-}
     restart: always
     environment:
@@ -122,7 +105,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: mapas
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - data_pg:/var/lib/postgresql/data
     networks:
