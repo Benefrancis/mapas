@@ -27,11 +27,11 @@
     <entry key="create database">false</entry>
     <entry key="Method used to simplify geometries">FAST</entry>
     <entry key="port">5432</entry>
-    <entry key="passwd">crypt1:dZJQrlgnSW/CO8pNWunyb3mGBBpFN1iB</entry>
-    <entry key="min connections">1</entry>
+    <entry key="passwd">crypt1:SH/QR8lrW/PRTQpS3gIVT2WF3EU8i7It</entry>
+    <entry key="min connections">2</entry>
     <entry key="dbtype">postgis</entry>
     <entry key="namespace">http://localhost/mapas_brasil</entry>
-    <entry key="max connections">10</entry>
+    <entry key="max connections">20</entry>
     <entry key="Evictor tests per run">3</entry>
     <entry key="Test while idle">true</entry>
     <entry key="user">postgres</entry>
@@ -39,5 +39,6 @@
   </connectionParameters>
   <__default>false</__default>
   <dateCreated>2025-03-18 10:12:15.285 UTC</dateCreated>
+  <dateModified>2025-03-18 19:46:44.201 UTC</dateModified>
   <disableOnConnFailure>false</disableOnConnFailure>
 </dataStore>

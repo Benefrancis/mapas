@@ -75,6 +75,7 @@ services:
       GEOWEBCACHE_CACHE_DIR: /var/lib/geowebcache/cache
       NETCDF_DATA_DIR: /var/lib/netcdf
       GRIB_CACHE_DIR: /var/lib/grib
+      ALLOWED_ORIGINS: http://localhost,http://territoriostradicionais.mpf.mp.br,https://territoriostradicionais.mpf.mp.br # Suas origens permitidas
     volumes:
       - ./logs:/var/log/geoserver
       - ./datadir:/var/lib/geoserver_data
@@ -83,6 +84,10 @@ services:
       - ./netcfd:/var/lib/netcdf
       - ./grib_cache:/var/lib/grib
       - ./context.xml:/opt/tomcat/conf/Catalina/localhost/geoserver.xml # mapeamento para o seu context.xml
+#      - ./web.xml:/opt/tomcat/webapps/geoserver/WEB-INF/web.xml
+      - ./web.xml.template:/opt/tomcat/webapps/geoserver/WEB-INF/web.xml.template
+      - ./geoinit.sh:/docker-entrypoint-initdb.d/geoinit.sh
+
     ports:
       - "8080:8080"
     networks:
