@@ -27,7 +27,11 @@ shp2pgsql -c -D -s 4326 -I -W LATIN1 tis_cr/tis_crPoint.shp mapas.tb_tis_cr_poin
 shp2pgsql -c -D -s 4326 -I -W LATIN1 quilombolas/Áreas de Quilombolas.shp mapas.tb_quilombolas | psql -U postgres -d mapas
 ```
 
+# Instalando o GDAL
 
+```prompt
+docker exec -i db4mapas bash -c "apt-get update && apt-get install -y gdal-bin"
+```
 
 
 ## Diagrama de Arquitetura

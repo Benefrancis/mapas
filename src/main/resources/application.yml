@@ -1,3 +1,7 @@
+app:
+  base-url: https://cnuc-backend.mma.gov.br/api/v1/uc/
+
+
 server:
   port: 80
   servlet:
@@ -36,10 +40,6 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:root}
       cache-null-values: true
-
-
-
-
 
 # Prometheus Configuration
 management:

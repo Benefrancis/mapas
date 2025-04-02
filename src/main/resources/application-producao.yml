@@ -29,3 +29,11 @@ spring:
           auto: update
         default_batch_fetch_size: 10
         generate-ddl: true
+        default_schema: uni_conservacao
+      # Envers configuration
+      org:
+        hibernate:
+          envers:
+            audit_table_suffix: _AUDIT
+            revision_field_name: REV
+            revision_type_field_name: REVTYPE
