@@ -1,30 +1,198 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Mapa</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <title>Mapa com Leaflet</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- Correção dos links do leaflet-control-layers -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-control-layers@2.0.1/dist/leaflet-control-layers.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/leaflet-control-layers@2.0.1/dist/leaflet-control-layers.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+          integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
     <style>
+        /* Fonte Roboto */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            overflow: hidden;
+        }
+
         #map {
-            height: 500px;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Estilos para os controles */
+        .leaflet-control-container {
+            z-index: 1000;
+        }
+
+        /* Estilos para o Layer Switcher (Retrátil) */
+        #layer-switcher-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
+
+        #layer-switcher-toggle {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 5px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            display: block;
+            text-align: center;
+        }
+
+        #layer-switcher {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            display: none; /* Oculta por padrão */
+        }
+
+        #layer-switcher h3 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 1.2em;
+            font-weight: 500;
+        }
+
+        #layer-switcher label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        #layer-switcher input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        /* Estilos para a Legenda (Retrátil) */
+        #legend-container {
+            position: absolute;
+            bottom: 20px;
+            right: 10px;
+            z-index: 1000;
+        }
+
+        #legend-toggle {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 5px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            display: block;
+            text-align: center;
+        }
+
+        #legend {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            display: none; /* Oculta por padrão */
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        #legend h3 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 1.2em;
+            font-weight: 500;
+        }
+
+        #legend div {
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        #legend img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Estilos para a Barra de Busca (Centralizada e Retrátil) */
+        #search-container {
+            position: absolute;
+            top: 10px;
+            left: 50%; /* Centraliza horizontalmente */
+            transform: translateX(-50%); /* Ajusta o posicionamento */
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center; /* Alinha verticalmente os elementos */
+        }
+
+        #search-container input[type="text"] {
+            padding: 8px;
+            border: none;
+            border-radius: 3px;
+            margin-right: 5px;
+            width: 200px;
+        }
+
+        #search-container button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        /* Icone para retrátil e expandir */
+        .toggle-icon {
+            margin-left: 5px; /* Espaço entre o texto e o ícone */
+            cursor: pointer; /* Muda o cursor para indicar que é clicável */
         }
     </style>
 </head>
 <body>
 <div id="map"></div>
 
+<!-- Controles Retráteis -->
+<div id="layer-switcher-container">
+    <div id="layer-switcher-toggle">Camadas <i class="fas fa-caret-down toggle-icon"></i></div>
+    <div id="layer-switcher">
+        <h3>Camadas</h3>
+    </div>
+</div>
+
+<div id="legend-container">
+    <div id="legend-toggle">Legenda <i class="fas fa-caret-down toggle-icon"></i></div>
+    <div id="legend">
+        <h3>Legenda</h3>
+    </div>
+</div>
+
+<div id="search-container">
+    <input type="text" id="search-input" placeholder="Buscar um local...">
+    <button id="search-button">Buscar</button>
+</div>
+
 <script>
+    // 1. Inicialização do Mapa
     var map = L.map('map').setView([-23.5505, -46.6333], 7);
 
-    // Dados das camadas (INJETADOS DIRETAMENTE)
-    var layersData =  {"layers":{"layer":[
+    // Adiciona escala
+    L.control.scale().addTo(map);
+
+    // 2. Dados das Camadas (JSON INJETADO)
+    var layersData = {"layers":{"layer":[
         {"name":"tb_aldeias_pontos","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_aldeias_pontos.json"},
         {"name":"tb_quilombolas","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_quilombolas.json"},
         {"name":"tb_tis_amazonia_legal_poligonais","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_tis_amazonia_legal_poligonais.json"},
@@ -33,30 +201,126 @@
         {"name":"tb_tis_poligonais","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_tis_poligonais.json"}
     ]}};
 
-    var baseLayers = {
-        "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        })
-    };
+    // 3. Camada Base (OpenStreetMap)
+    var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
-    var overlayMaps = {};
-
-    // Cria camadas WMS e adiciona ao overlayMaps
-    layersData.layers.layer.forEach(function (layer) {
-        var layerName = layer.name;
-        var wmsLayer = L.tileLayer.wms("http://localhost:8080/geoserver/mapas/wms", {
+    // 4. Criação das Camadas WMS (GeoServer)
+    function createWMSLayer(layerName) {
+        return L.tileLayer.wms("http://localhost:8080/geoserver/mapas/wms", {
             layers: 'mapas:' + layerName,
             format: 'image/png',
             transparent: true,
             version: '1.1.0',
-            tiled: true
+            tiled: true,
+            attribution: "GeoServer"
         });
-        overlayMaps[layerName] = wmsLayer;
+    }
+
+    var wmsLayers = {}; // Armazenar as camadas WMS
+
+    layersData.layers.layer.forEach(function (layer) {
+        var layerName = layer.name;
+        var wmsLayer = createWMSLayer(layerName);
+        wmsLayers[layerName] = wmsLayer; // Armazena a camada
     });
 
-    var layerControl = L.control.layers(baseLayers, overlayMaps).addTo(map);  // Removido o .group
-    baseLayers["OpenStreetMap"].addTo(map); // Adiciona a camada base ao mapa inicialmente
+    // 5. Controles de Camada (Layer Switcher) - Criado Manualmente
 
+    var layerSwitcherDiv = document.getElementById('layer-switcher');
+
+
+        function populateLayerSwitcher() {
+            while (layerSwitcherDiv.firstChild) {
+                layerSwitcherDiv.removeChild(layerSwitcherDiv.firstChild);
+            }
+
+            var osmLabel = document.createElement('label');
+            var osmCheckbox = document.createElement('input');
+            osmCheckbox.type = 'checkbox';
+            osmCheckbox.checked = true;
+            osmCheckbox.addEventListener('change', function() {
+                if (osmCheckbox.checked) {
+                    map.addLayer(osmLayer);
+                } else {
+                    map.removeLayer(osmLayer);
+                }
+            });
+            osmLabel.appendChild(osmCheckbox);
+            osmLabel.appendChild(document.createTextNode(' OpenStreetMap'));
+            layerSwitcherDiv.appendChild(osmLabel);
+
+            for (var layerName in wmsLayers) {
+                (function(layer) { // Closure para "congelar" o valor de layer
+                    var label = document.createElement('label');
+                    var checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = map.hasLayer(layer);
+                    checkbox.addEventListener('change', function() {
+                        if (checkbox.checked) {
+                            map.addLayer(layer);
+                        } else {
+                            map.removeLayer(layer);
+                        }
+                    });
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(' ' + layerName));
+                    layerSwitcherDiv.appendChild(label);
+                })(wmsLayers[layerName]); // Passa o valor atual de layer para a closure
+            }
+        }
+    populateLayerSwitcher();
+
+    // 6. Legenda (Dinâmica)
+    var legendDiv = document.getElementById('legend');
+
+    function getLegendUrl(layerName) {
+        return "http://localhost:8080/geoserver/mapas/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=mapas:" + layerName;
+    }
+
+    function populateLegend() {
+        while (legendDiv.firstChild) {
+            legendDiv.removeChild(legendDiv.firstChild);
+        }
+
+        for (var layerName in wmsLayers) {
+            var legendUrl = getLegendUrl(layerName);
+            var img = document.createElement('img');
+            img.src = legendUrl;
+            img.alt = "Legenda para " + layerName;
+            var layerLegendDiv = document.createElement('div');
+            layerLegendDiv.innerHTML = "<strong>" + layerName + ":</strong><br>";
+            layerLegendDiv.appendChild(img);
+            legendDiv.appendChild(layerLegendDiv);
+        }
+    }
+
+    populateLegend();
+
+    // 7. Barra de Busca (Usando leaflet-control-geocoder)
+    L.Control.geocoder().addTo(map);
+
+    // 8. Geolocalização
+    map.locate({setView: true, maxZoom: 16});
+
+    function onLocationFound(e) {
+        var radius = e.accuracy / 2;
+
+        L.marker(e.latlng).addTo(map)
+            .bindPopup("Você está aqui com " + radius + " metros de precisão").openPopup();
+
+        L.circle(e.latlng, radius).addTo(map);
+    }
+
+    function onLocationError(e) {
+        alert(e.message);
+    }
+
+    map.on('locationfound', onLocationFound);
+    map.on('locationerror', onLocationError);
+
+    // 9. Update Position (Mantendo a lógica do Leaflet)
     var marker = L.marker([-23.5505, -46.6333]).addTo(map);
 
     function updatePosition() {
@@ -71,7 +335,18 @@
         });
     }
 
-   // setInterval(updatePosition, 5000);
+    //setInterval(updatePosition, 5000);
+
+    // Controles Retráteis
+    $(document).ready(function() {
+        $("#layer-switcher-toggle").click(function() {
+            $("#layer-switcher").slideToggle("slow");
+        });
+
+        $("#legend-toggle").click(function() {
+            $("#legend").slideToggle("slow");
+        });
+    });
 </script>
 </body>
 </html>
