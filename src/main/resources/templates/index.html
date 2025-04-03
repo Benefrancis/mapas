@@ -40,7 +40,14 @@
     }).addTo(map);
 
     // Dados das camadas (INJETADOS DIRETAMENTE)
-    var layersData =  {"layers":{"layer":[{"name":"tb_aldeias_pontos","href":"http://localhost:8080/geoserver/rest/workspaces/mapas_brasil/layers/tb_aldeias_pontos.json"},{"name":"tb_quilombolas","href":"http://localhost:8080/geoserver/rest/workspaces/mapas_brasil/layers/tb_quilombolas.json"},{"name":"tb_tis_amazonia_legal_poligonais","href":"http://localhost:8080/geoserver/rest/workspaces/mapas_brasil/layers/tb_tis_amazonia_legal_poligonais.json"},{"name":"tb_tis_pontos","href":"http://localhost:8080/geoserver/rest/workspaces/mapas_brasil/layers/tb_tis_pontos.json"},{"name":"tb_uf","href":"http://localhost:8080/geoserver/rest/workspaces/mapas_brasil/layers/tb_uf.json"}]}};
+    var layersData =  {"layers":{"layer":[
+    {"name":"tb_aldeias_pontos","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_aldeias_pontos.json"},
+    {"name":"tb_quilombolas","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_quilombolas.json"},
+    {"name":"tb_tis_amazonia_legal_poligonais","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_tis_amazonia_legal_poligonais.json"},
+    {"name":"tb_tis_pontos","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_tis_pontos.json"},
+    {"name":"tb_uf","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_uf.json"},
+    {"name":"tb_tis_poligonais","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_tis_poligonais.json"}
+    ]}};
 
     // Função para criar os controles de camada dinamicamente
     function createLayerControls(layers) {
@@ -71,8 +78,8 @@
             layerControlsDiv.appendChild(layerControlDiv);
 
             // Cria a camada WMS
-            var wmsLayer = L.tileLayer.wms("http://localhost:8080/geoserver/mapas_brasil/wms", {
-                layers: 'mapas_brasil:' + layerName,
+            var wmsLayer = L.tileLayer.wms("http://localhost:8080/geoserver/mapas/wms", {
+                layers: 'mapas:' + layerName,
                 format: 'image/png',
                 transparent: true,
                 version: '1.1.0',

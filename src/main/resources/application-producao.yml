@@ -29,7 +29,7 @@ spring:
           auto: update
         default_batch_fetch_size: 10
         generate-ddl: true
-        default_schema: uni_conservacao
+
       # Envers configuration
       org:
         hibernate:

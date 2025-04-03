@@ -35,3 +35,6 @@ build/
 # Backup das tabelas
 /documentos_do_projeto/database/
 
+/dados/
+
+*.sqlc

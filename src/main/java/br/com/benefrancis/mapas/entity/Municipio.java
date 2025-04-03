@@ -14,7 +14,7 @@ import org.locationtech.jts.geom.MultiPolygon;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "tb_municipios", schema = "uni_conservacao")
+@Table(name = "tb_municipios", schema = "funai")
 public class Municipio {
 
     @Id

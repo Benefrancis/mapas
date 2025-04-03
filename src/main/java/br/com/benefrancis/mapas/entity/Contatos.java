@@ -6,7 +6,7 @@ import lombok.ToString;
 import org.hibernate.envers.Audited;
 
 @Entity
-@Table(name = "contatos")
+@Table(name = "contatos",  schema = "uni_conservacao")
 @Data
 @Audited
 public class Contatos {

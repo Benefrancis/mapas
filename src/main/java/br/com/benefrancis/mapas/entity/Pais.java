@@ -13,7 +13,7 @@ import org.locationtech.jts.geom.MultiPolygon;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "tb_pais", schema = "uni_conservacao")
+@Table(name = "tb_pais", schema = "funai")
 public class Pais {
 
     @Id
