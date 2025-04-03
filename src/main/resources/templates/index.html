@@ -1,106 +1,61 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <title>Mapa</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css"/>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Correção dos links do leaflet-control-layers -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-control-layers@2.0.1/dist/leaflet-control-layers.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-control-layers@2.0.1/dist/leaflet-control-layers.min.js"></script>
+
     <style>
         #map {
             height: 500px;
             width: 100%;
-        }
-
-        #layer-controls {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            margin-bottom: 10px;
-        }
-
-        .layer-control {
-            margin-right: 10px;
-            margin-bottom: 5px;
         }
     </style>
 </head>
 <body>
 <div id="map"></div>
 
-<div id="layer-controls">
-    <!-- Os controles de camada serão gerados aqui dinamicamente -->
-</div>
-
 <script>
     var map = L.map('map').setView([-23.5505, -46.6333], 7);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
     // Dados das camadas (INJETADOS DIRETAMENTE)
     var layersData =  {"layers":{"layer":[
-    {"name":"tb_aldeias_pontos","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_aldeias_pontos.json"},
-    {"name":"tb_quilombolas","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_quilombolas.json"},
-    {"name":"tb_tis_amazonia_legal_poligonais","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_tis_amazonia_legal_poligonais.json"},
-    {"name":"tb_tis_pontos","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_tis_pontos.json"},
-    {"name":"tb_uf","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_uf.json"},
-    {"name":"tb_tis_poligonais","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_tis_poligonais.json"}
+        {"name":"tb_aldeias_pontos","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_aldeias_pontos.json"},
+        {"name":"tb_quilombolas","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_quilombolas.json"},
+        {"name":"tb_tis_amazonia_legal_poligonais","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_tis_amazonia_legal_poligonais.json"},
+        {"name":"tb_tis_pontos","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_tis_pontos.json"},
+        {"name":"tb_uf","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_uf.json"},
+        {"name":"tb_tis_poligonais","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_tis_poligonais.json"}
     ]}};
 
-    // Função para criar os controles de camada dinamicamente
-    function createLayerControls(layers) {
-        var layerControlsDiv = document.getElementById('layer-controls');
+    var baseLayers = {
+        "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        })
+    };
 
-        layers.forEach(function (layer) {
-            var layerName = layer.name;
-            var layerTitle = layer.name; // Use layer.name como título
+    var overlayMaps = {};
 
-            // Cria o elemento checkbox
-            var checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = layerName + '-checkbox';
-            checkbox.checked = true; // Camada visível por padrão
-
-            // Cria o label para o checkbox
-            var label = document.createElement('label');
-            label.htmlFor = layerName + '-checkbox';
-            label.textContent = layerTitle;
-
-            // Cria o div para o controle de camada (checkbox + label)
-            var layerControlDiv = document.createElement('div');
-            layerControlDiv.classList.add('layer-control');
-            layerControlDiv.appendChild(checkbox);
-            layerControlDiv.appendChild(label);
-
-            // Adiciona o controle de camada ao div principal
-            layerControlsDiv.appendChild(layerControlDiv);
-
-            // Cria a camada WMS
-            var wmsLayer = L.tileLayer.wms("http://localhost:8080/geoserver/mapas/wms", {
-                layers: 'mapas:' + layerName,
-                format: 'image/png',
-                transparent: true,
-                version: '1.1.0',
-                tiled: true
-            }).addTo(map);  // Adiciona a camada ao mapa inicialmente
-
-            // Adiciona o event listener para o checkbox
-            checkbox.addEventListener('change', function () {
-                if (this.checked) {
-                    map.addLayer(wmsLayer);
-                } else {
-                    map.removeLayer(wmsLayer);
-                }
-            });
+    // Cria camadas WMS e adiciona ao overlayMaps
+    layersData.layers.layer.forEach(function (layer) {
+        var layerName = layer.name;
+        var wmsLayer = L.tileLayer.wms("http://localhost:8080/geoserver/mapas/wms", {
+            layers: 'mapas:' + layerName,
+            format: 'image/png',
+            transparent: true,
+            version: '1.1.0',
+            tiled: true
         });
-    }
-
-    // Chama a função para criar os controles de camada com os dados injetados
-    $(document).ready(function () {
-        createLayerControls(layersData.layers.layer);
+        overlayMaps[layerName] = wmsLayer;
     });
+
+    var layerControl = L.control.layers(baseLayers, overlayMaps).addTo(map);  // Removido o .group
+    baseLayers["OpenStreetMap"].addTo(map); // Adiciona a camada base ao mapa inicialmente
 
     var marker = L.marker([-23.5505, -46.6333]).addTo(map);
 
