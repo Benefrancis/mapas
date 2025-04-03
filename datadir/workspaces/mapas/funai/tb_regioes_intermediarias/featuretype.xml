@@ -1,0 +1,53 @@
+<featureType>
+  <id>FeatureTypeInfoImpl-f9a5611:195f8671afa:-7fed</id>
+  <name>tb_regioes_intermediarias</name>
+  <nativeName>tb_regioes_intermediarias</nativeName>
+  <namespace>
+    <id>NamespaceInfoImpl-f9a5611:195f8671afa:-7ffb</id>
+  </namespace>
+  <title>tb_regioes_intermediarias</title>
+  <keywords>
+    <string>features</string>
+    <string>tb_regioes_intermediarias</string>
+  </keywords>
+  <nativeCRS>GEOGCS[&quot;WGS 84&quot;, 
+  DATUM[&quot;World Geodetic System 1984&quot;, 
+    SPHEROID[&quot;WGS 84&quot;, 6378137.0, 298.257223563, AUTHORITY[&quot;EPSG&quot;,&quot;7030&quot;]], 
+    AUTHORITY[&quot;EPSG&quot;,&quot;6326&quot;]], 
+  PRIMEM[&quot;Greenwich&quot;, 0.0, AUTHORITY[&quot;EPSG&quot;,&quot;8901&quot;]], 
+  UNIT[&quot;degree&quot;, 0.017453292519943295], 
+  AXIS[&quot;Geodetic longitude&quot;, EAST], 
+  AXIS[&quot;Geodetic latitude&quot;, NORTH], 
+  AUTHORITY[&quot;EPSG&quot;,&quot;4326&quot;]]</nativeCRS>
+  <srs>EPSG:4326</srs>
+  <nativeBoundingBox>
+    <minx>-73.9904556274414</minx>
+    <maxx>-28.847639083862305</maxx>
+    <miny>-33.75117874145508</miny>
+    <maxy>5.271841526031494</maxy>
+    <crs>EPSG:4326</crs>
+  </nativeBoundingBox>
+  <latLonBoundingBox>
+    <minx>-73.9904556274414</minx>
+    <maxx>-28.847639083862305</maxx>
+    <miny>-33.75117874145508</miny>
+    <maxy>5.271841526031494</maxy>
+    <crs>EPSG:4326</crs>
+  </latLonBoundingBox>
+  <projectionPolicy>FORCE_DECLARED</projectionPolicy>
+  <enabled>true</enabled>
+  <store class="dataStore">
+    <id>DataStoreInfoImpl-f9a5611:195f8671afa:-7ff8</id>
+  </store>
+  <serviceConfiguration>false</serviceConfiguration>
+  <simpleConversionEnabled>false</simpleConversionEnabled>
+  <internationalTitle/>
+  <internationalAbstract/>
+  <maxFeatures>0</maxFeatures>
+  <numDecimals>0</numDecimals>
+  <padWithZeros>false</padWithZeros>
+  <forcedDecimal>false</forcedDecimal>
+  <overridingServiceSRS>false</overridingServiceSRS>
+  <skipNumberMatched>false</skipNumberMatched>
+  <circularArcPresent>false</circularArcPresent>
+</featureType>

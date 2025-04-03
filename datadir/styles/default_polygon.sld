@@ -30,8 +30,8 @@
               <CssParameter name="fill-opacity">0</CssParameter>
             </Fill>
             <Stroke>
-              <CssParameter name="stroke">#00FFFF</CssParameter>
-              <CssParameter name="stroke-width">2</CssParameter>
+              <CssParameter name="stroke">#38b6ff</CssParameter>
+              <CssParameter name="stroke-width">1</CssParameter>
             </Stroke>
           </PolygonSymbolizer>
         </Rule>

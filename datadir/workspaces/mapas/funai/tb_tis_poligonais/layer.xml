@@ -1,0 +1,22 @@
+<layer>
+  <name>tb_tis_poligonais</name>
+  <id>LayerInfoImpl-5b300ea:195f87ab6ee:-7ff0</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--6cff62a:195f89b50ec:-7fe5</id>
+  </defaultStyle>
+  <styles class="linked-hash-set">
+    <style>
+      <id>StyleInfoImpl--6cff62a:195f89b50ec:-7fe5</id>
+    </style>
+  </styles>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl-5b300ea:195f87ab6ee:-7ff1</id>
+  </resource>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+  <dateCreated>2025-04-02 21:55:14.654 UTC</dateCreated>
+  <dateModified>2025-04-03 02:30:21.776 UTC</dateModified>
+</layer>

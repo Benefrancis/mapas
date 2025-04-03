@@ -1,0 +1,53 @@
+<featureType>
+  <id>FeatureTypeInfoImpl-5b300ea:195f87ab6ee:-7feb</id>
+  <name>tb_tis_pontos_portarias_point</name>
+  <nativeName>tb_tis_pontos_portarias_point</nativeName>
+  <namespace>
+    <id>NamespaceInfoImpl-f9a5611:195f8671afa:-7ffb</id>
+  </namespace>
+  <title>tb_tis_pontos_portarias_point</title>
+  <keywords>
+    <string>features</string>
+    <string>tb_tis_pontos_portarias_point</string>
+  </keywords>
+  <nativeCRS>GEOGCS[&quot;WGS 84&quot;, 
+  DATUM[&quot;World Geodetic System 1984&quot;, 
+    SPHEROID[&quot;WGS 84&quot;, 6378137.0, 298.257223563, AUTHORITY[&quot;EPSG&quot;,&quot;7030&quot;]], 
+    AUTHORITY[&quot;EPSG&quot;,&quot;6326&quot;]], 
+  PRIMEM[&quot;Greenwich&quot;, 0.0, AUTHORITY[&quot;EPSG&quot;,&quot;8901&quot;]], 
+  UNIT[&quot;degree&quot;, 0.017453292519943295], 
+  AXIS[&quot;Geodetic longitude&quot;, EAST], 
+  AXIS[&quot;Geodetic latitude&quot;, NORTH], 
+  AUTHORITY[&quot;EPSG&quot;,&quot;4326&quot;]]</nativeCRS>
+  <srs>EPSG:4326</srs>
+  <nativeBoundingBox>
+    <minx>-73.58052825927734</minx>
+    <maxx>-34.907997131347656</maxx>
+    <miny>-30.392969131469727</miny>
+    <maxy>2.935089111328125</maxy>
+    <crs>EPSG:4326</crs>
+  </nativeBoundingBox>
+  <latLonBoundingBox>
+    <minx>-73.58052825927734</minx>
+    <maxx>-34.907997131347656</maxx>
+    <miny>-30.392969131469727</miny>
+    <maxy>2.935089111328125</maxy>
+    <crs>EPSG:4326</crs>
+  </latLonBoundingBox>
+  <projectionPolicy>FORCE_DECLARED</projectionPolicy>
+  <enabled>true</enabled>
+  <store class="dataStore">
+    <id>DataStoreInfoImpl-f9a5611:195f8671afa:-7ff8</id>
+  </store>
+  <serviceConfiguration>false</serviceConfiguration>
+  <simpleConversionEnabled>false</simpleConversionEnabled>
+  <internationalTitle/>
+  <internationalAbstract/>
+  <maxFeatures>0</maxFeatures>
+  <numDecimals>0</numDecimals>
+  <padWithZeros>false</padWithZeros>
+  <forcedDecimal>false</forcedDecimal>
+  <overridingServiceSRS>false</overridingServiceSRS>
+  <skipNumberMatched>false</skipNumberMatched>
+  <circularArcPresent>false</circularArcPresent>
+</featureType>

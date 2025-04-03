@@ -1,0 +1,16 @@
+<layer>
+  <name>tb_uf</name>
+  <id>LayerInfoImpl-f9a5611:195f8671afa:-7ff6</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl-1924c1a6:195f4228354:-7ffe</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl-f9a5611:195f8671afa:-7ff7</id>
+  </resource>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+  <dateCreated>2025-04-02 21:41:22.704 UTC</dateCreated>
+</layer>

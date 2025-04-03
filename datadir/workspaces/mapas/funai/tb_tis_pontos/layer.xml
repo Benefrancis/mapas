@@ -1,0 +1,22 @@
+<layer>
+  <name>tb_tis_pontos</name>
+  <id>LayerInfoImpl-5b300ea:195f87ab6ee:-7fec</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--540b4beb:195f9826cc9:-7ff7</id>
+  </defaultStyle>
+  <styles class="linked-hash-set">
+    <style>
+      <id>StyleInfoImpl-1924c1a6:195f4228354:-8000</id>
+    </style>
+  </styles>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl-5b300ea:195f87ab6ee:-7fed</id>
+  </resource>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+  <dateCreated>2025-04-02 21:55:52.947 UTC</dateCreated>
+  <dateModified>2025-04-03 02:50:31.180 UTC</dateModified>
+</layer>

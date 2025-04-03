@@ -1,0 +1,55 @@
+<GeoServerTileLayer>
+  <id>LayerInfoImpl-5b300ea:195f87ab6ee:-7ff8</id>
+  <enabled>true</enabled>
+  <inMemoryCached>true</inMemoryCached>
+  <name>mapas:tb_quilombolas</name>
+  <mimeFormats>
+    <string>image/png</string>
+    <string>image/jpeg</string>
+  </mimeFormats>
+  <gridSubsets>
+    <gridSubset>
+      <gridSetName>EPSG:900913</gridSetName>
+      <extent>
+        <coords>
+          <double>-7145799.669970816</double>
+          <double>-3710953.6307980428</double>
+          <double>-3874966.655913867</double>
+          <double>329109.86990100995</double>
+        </coords>
+      </extent>
+    </gridSubset>
+    <gridSubset>
+      <gridSetName>EPSG:4326</gridSetName>
+      <extent>
+        <coords>
+          <double>-64.19181060791016</double>
+          <double>-31.600271224975586</double>
+          <double>-34.809417724609375</double>
+          <double>2.955133199691772</double>
+        </coords>
+      </extent>
+    </gridSubset>
+  </gridSubsets>
+  <metaWidthHeight>
+    <int>4</int>
+    <int>4</int>
+  </metaWidthHeight>
+  <expireCache>0</expireCache>
+  <expireClients>0</expireClients>
+  <parameterFilters>
+    <styleParameterFilter>
+      <key>STYLES</key>
+      <defaultValue>mapas:ZUMBI O REI</defaultValue>
+      <allowedStyles class="sorted-set">
+        <string>mapas:ZUMBI O REI</string>
+      </allowedStyles>
+      <availableStyles class="sorted-set">
+        <string>mapas:ZUMBI O REI</string>
+      </availableStyles>
+      <defaultStyle>mapas:ZUMBI O REI</defaultStyle>
+    </styleParameterFilter>
+  </parameterFilters>
+  <gutter>0</gutter>
+  <cacheWarningSkips/>
+</GeoServerTileLayer>

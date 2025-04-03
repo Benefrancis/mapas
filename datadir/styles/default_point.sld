@@ -22,18 +22,18 @@
 				<Rule>
 					<Name>Rule 1</Name>
 					<Title>Red Square point</Title>
-					<Abstract>A red fill with 6 pixels size</Abstract>
+					<Abstract>A red fill with 3 pixels size</Abstract>
 
 					<!-- like a linesymbolizer but with a fill too -->
 					<PointSymbolizer>
 						<Graphic>
 							<Mark>
-								<WellKnownName>square</WellKnownName>
+								<WellKnownName>circle</WellKnownName>
 								<Fill>
-									<CssParameter name="fill">#FF0000</CssParameter>
+									<CssParameter name="fill">#f1800c</CssParameter>
 								</Fill>
 							</Mark>
-							<Size>6</Size>
+							<Size>12</Size>
 						</Graphic>
 					</PointSymbolizer>
 				</Rule>
