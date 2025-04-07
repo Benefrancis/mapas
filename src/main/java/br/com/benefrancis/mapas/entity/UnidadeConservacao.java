@@ -1,24 +1,25 @@
 package br.com.benefrancis.mapas.entity;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.envers.Audited;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.Set;
 
-@Entity
-@Table(name = "unidade_conservacao", schema = "uni_conservacao")
 @Data
 @Audited
+@Entity
+@Table(name = "unidade_conservacao", schema = "uni_conservacao")
 public class UnidadeConservacao {
 
     @Id
     @Column(name = "uc_id")
-    private Integer ucId;
+    private Long id;
 
     @Column(name = "uc_cod_cnuc", columnDefinition = "TEXT")
     private String ucCodCnuc;
@@ -83,6 +84,28 @@ public class UnidadeConservacao {
     @Column(name = "logo_uc", columnDefinition = "TEXT")
     private String logoUc;
 
+    @Column(name = "geo_area_hectares_uc", columnDefinition = "TEXT")
+    private String geoAreaHectaresUc;
+
+    @Column(name = "geo_area_hectares_za", columnDefinition = "TEXT")
+    private String geoAreaHectaresZa;
+
+    @Column(name = "uc_sit_fund", columnDefinition = "TEXT")
+    private String ucSitFund;
+
+    @Column(name = "uc_pop_trad_ben_ou_res", columnDefinition = "TEXT")
+    private String ucPopTradBenOuRes;
+
+    private String areaAmazonia;
+    private String areaCaatinga;
+    private String areaCerrado;
+    private String areaMataAtlantica;
+    private String areaPampa;
+    private String areaPantanal;
+    private String areaMarinha;
+
+
+
     @Column(name = "ato_legal_criacao_full_name", columnDefinition = "TEXT")
     private String atoLegalCriacaoFullName;
 
@@ -101,82 +124,100 @@ public class UnidadeConservacao {
     @Column(name = "outros_atos_legais_link", columnDefinition = "TEXT")
     private String outrosAtosLegaisLink;
 
-    @Column(name = "plano_manejo_full_name", columnDefinition = "TEXT")
-    private String planoManejoFullName;
 
-    @Column(name = "plano_manejo_links", columnDefinition = "TEXT")
-    private String planoManejoLinks;
 
-    @Column(name = "doc_conselho_full_name", columnDefinition = "TEXT")
-    private String docConselhoFullName;
 
-    @Column(name = "doc_conselho_link", columnDefinition = "TEXT")
-    private String docConselhoLink;
 
-    @Column(name = "out_inst_gest_full_name", columnDefinition = "TEXT")
-    private String outInstGestFullName;
 
-    @Column(name = "out_inst_gest_links", columnDefinition = "TEXT")
-    private String outInstGestLinks;
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<OutrosInstrumentosGestao> outrosInstrumentosGestao = new LinkedHashSet<>();
 
-    @Column(name = "geo_area_hectares_uc", columnDefinition = "TEXT")
-    private String geoAreaHectaresUc;
+    @OneToOne(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Contatos contatos;
 
-    @Column(name = "geo_area_hectares_za", columnDefinition = "TEXT")
-    private String geoAreaHectaresZa;
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<LegSolos> solos;
 
-    @Column(name = "uc_sit_fund", columnDefinition = "TEXT")
-    private String ucSitFund;
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<Emails> emails;
 
-    @Column(name = "uc_pop_trad_ben_ou_res", columnDefinition = "TEXT")
-    private String ucPopTradBenOuRes;
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<Telefone> telefones;
 
-//    @OneToOne(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @ToString.Exclude
-//    private Contatos contatos;
-//
-//    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<AtosLegais> atosLegais;
-//
-//    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Bioma> biomas;
-//
-//    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<LegSolos> legSolos;
-//
-//    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Climas> climas;
-//
-//    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Rios> rios;
-//
-//    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Bacias> bacias;
-//
-//    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<UfAbrang> ufAbrang;
-//
-//    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<MunAbrang> munAbrang;
-//
-//    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<GruSociais> gruSociais;
-//
-//    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Videos> videos;
-//
-//    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<RedesSociais> redesSociais;
-//
-//    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Visitas> visitas;
-//
-//    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Ppgr> ppgr;
-//
-//    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<UcSiteLinks> ucSiteLinks;
-//
-//    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<SocialNetworksLinks> socialNetworksLinks;
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<AtosLegais> atosLegais;
+
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<DocumentosConselho> docsConselho;
+
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<Bioma> biomas;
+
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<LegSolos> legSolos;
+
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<Climas> climas;
+
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<Rios> rios;
+
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<Bacias> bacias;
+
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<UfAbrang> ufAbrang;
+
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<MunAbrang> munAbrang;
+
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<GruSociais> gruSociais;
+
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<Videos> videos;
+
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<RedesSociais> redesSociais;
+
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<Visitas> visitas;
+
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<Ppgr> ppgr;
+
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<UcSiteLinks> ucSiteLinks;
+
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<SocialNetworksLinks> socialNetworksLinks;
+
+    @OneToMany(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<PlanosManejo> planosDeManejo;
+
+    @OneToOne(mappedBy = "unidadeConservacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Mapa mapa;
 }

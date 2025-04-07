@@ -1,26 +1,35 @@
 package br.com.benefrancis.mapas.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 import org.hibernate.envers.Audited;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 @Data
 @Audited
 @Entity
-@Table(name = "atos_legais", schema = "uni_conservacao")
-public class AtosLegais {
+@Builder
+@Table(name = "planos_manejo", schema = "uni_conservacao")
+public class PlanosManejo {
 
     @Id
     @Column(name = "docleg_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "uc_id", referencedColumnName = "uc_id", nullable = false, foreignKey = @ForeignKey(name = "fk_UC_ATOS_LEGAIS"))
-    @ToString.Exclude //Avoid circular reference
+    @JoinColumn(name = "uc_id", referencedColumnName = "uc_id", foreignKey = @ForeignKey(name = "fk_UC_PLANOS_MANEJO"))
+    @ToString.Exclude
     private UnidadeConservacao unidadeConservacao;
+
+
+    @Column(name = "plano_manejo_full_name", columnDefinition = "TEXT")
+    private String planoManejoFullName;
+
+    @Column(name = "plano_manejo_links", columnDefinition = "TEXT")
+    private String planoManejoLinks;
 
     @Column(name = "docleg_classdoc_id")
     private Integer doclegClassdocId;
@@ -35,10 +44,10 @@ public class AtosLegais {
     private String doclegLink2;
 
     @Column(name = "docleg_dt_doc")
-    private LocalDate doclegDtDoc;
+    private Date doclegDtDoc;
 
     @Column(name = "docleg_dt_publicacao")
-    private LocalDate doclegDtPublicacao;
+    private Date doclegDtPublicacao;
 
     @Column(name = "docleg_nu_area_documento", columnDefinition = "TEXT")
     private String doclegNuAreaDocumento;
@@ -57,11 +66,4 @@ public class AtosLegais {
 
     @Column(name = "tipo_inst_nome", columnDefinition = "TEXT")
     private String tipoInstNome;
-
-    @Column(name = "tipo", columnDefinition = "TEXT")
-    private String tipo;
-
-
-
-
 }

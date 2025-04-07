@@ -2,23 +2,25 @@ package br.com.benefrancis.mapas.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.envers.Audited;
 
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "ppgr", schema = "uni_conservacao")
 @Data
 @Audited
+@Entity
+@Table(name = "ppgr", schema = "uni_conservacao")
 public class Ppgr {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ppgr_id")
-    private Long ppgrId;
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "uc_id", nullable = false)
+    @ManyToOne  (fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "uc_id", referencedColumnName = "uc_id", nullable = false, foreignKey = @ForeignKey(name = "fk_UC_PPGR"))
+    @ToString.Exclude
     private UnidadeConservacao unidadeConservacao;
 
     @Column(name = "full_name_ppgr", columnDefinition = "TEXT")

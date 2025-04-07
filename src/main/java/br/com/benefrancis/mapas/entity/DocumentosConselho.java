@@ -1,8 +1,7 @@
 package br.com.benefrancis.mapas.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.envers.Audited;
 
 import java.time.LocalDate;
@@ -10,16 +9,19 @@ import java.time.LocalDate;
 @Data
 @Audited
 @Entity
-@Table(name = "atos_legais", schema = "uni_conservacao")
-public class AtosLegais {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "documentos_conselho", schema = "uni_conservacao")
+public class DocumentosConselho {
 
     @Id
     @Column(name = "docleg_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "uc_id", referencedColumnName = "uc_id", nullable = false, foreignKey = @ForeignKey(name = "fk_UC_ATOS_LEGAIS"))
-    @ToString.Exclude //Avoid circular reference
+    @JoinColumn(name = "uc_id", referencedColumnName = "uc_id", foreignKey = @ForeignKey(name = "fk_UC_DOC_CONSELHO"))
+    @ToString.Exclude
     private UnidadeConservacao unidadeConservacao;
 
     @Column(name = "docleg_classdoc_id")
@@ -57,11 +59,5 @@ public class AtosLegais {
 
     @Column(name = "tipo_inst_nome", columnDefinition = "TEXT")
     private String tipoInstNome;
-
-    @Column(name = "tipo", columnDefinition = "TEXT")
-    private String tipo;
-
-
-
 
 }
