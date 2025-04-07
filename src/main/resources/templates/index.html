@@ -5,8 +5,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
-    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <!-- Removido link e script do leaflet-control-geocoder -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/> -->
+    <!-- <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
           integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
           crossorigin="anonymous" referrerpolicy="no-referrer"/>
@@ -35,49 +36,79 @@
             z-index: 1000;
         }
 
-        /* Estilos para o Layer Switcher (Retrátil) */
-        #layer-switcher-container {
+        /* --- Contêiner Centralizado (Apenas Seletor de Camadas) --- */
+        #combined-control-container {
             position: absolute;
             top: 10px;
-            right: 10px;
-            z-index: 1000;
-        }
-
-        #layer-switcher-toggle {
+            left: 50%; /* Centraliza horizontalmente */
+            transform: translateX(-50%); /* Ajusta o posicionamento */
+            z-index: 1001; /* Acima dos outros controles leaflet */
             background: rgba(255, 255, 255, 0.8);
-            padding: 5px;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            display: block;
-            text-align: center;
-        }
-
-        #layer-switcher {
-            background: rgba(255, 255, 255, 0.8);
-            padding: 10px;
+            padding: 8px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column; /* Itens empilhados verticalmente */
+            align-items: center; /* Centraliza o botão de toggle horizontalmente */
+            max-width: 350px; /* Limita a largura máxima */
+        }
+
+        /* Linha superior contendo APENAS o toggle */
+        #combined-top-row {
+            display: flex; /* Mantido flex para consistência, mas com um item */
+            justify-content: center; /* Centraliza o botão dentro da linha */
+            width: 100%; /* Ocupa toda a largura do container pai */
+            margin-bottom: 5px; /* Espaço antes da lista de camadas, se aberta */
+        }
+
+        /* Removidos estilos do input e button de busca */
+
+        /* Estilos para o Botão Toggle do Layer Switcher (dentro do combinado) */
+        #layer-switcher-toggle {
+            background-color: #f0f0f0; /* Um fundo leve para destacar */
+            padding: 8px 10px;
+            border-radius: 3px; /* Consistente com outros botões */
+            cursor: pointer;
+            display: flex; /* Para alinhar texto e ícone */
+            align-items: center;
+            text-align: center;
+            font-size: 0.9em;
+            white-space: nowrap; /* Evita quebra de linha */
+            /* flex-shrink: 0; */ /* Não é mais estritamente necessário com um item */
+        }
+
+        /* Estilos para o Layer Switcher (a lista, dentro do combinado) */
+        #layer-switcher {
+            padding: 10px;
             display: none; /* Oculta por padrão */
+            margin-top: 5px; /* Espaço acima da lista quando aberta */
+            border-top: 1px solid #ccc; /* Linha separadora */
+            max-height: 250px; /* Altura máxima para a lista */
+            overflow-y: auto; /* Scroll se necessário */
+            width: 100%; /* Faz a lista ocupar a largura do container */
+            box-sizing: border-box; /* Inclui padding na largura */
         }
 
         #layer-switcher h3 {
             margin-top: 0;
-            margin-bottom: 5px;
-            font-size: 1.2em;
+            margin-bottom: 10px;
+            font-size: 1.1em;
             font-weight: 500;
+            text-align: center;
         }
 
         #layer-switcher label {
             display: block;
             margin-bottom: 5px;
+            font-size: 0.95em;
         }
 
         #layer-switcher input[type="checkbox"] {
-            margin-right: 5px;
+            margin-right: 8px;
         }
 
-        /* Estilos para a Legenda (Retrátil) */
+
+        /* Estilos para a Legenda (Mantido como antes) */
         #legend-container {
             position: absolute;
             bottom: 20px;
@@ -87,11 +118,12 @@
 
         #legend-toggle {
             background: rgba(255, 255, 255, 0.8);
-            padding: 5px;
+            padding: 5px 10px;
             border-radius: 5px;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
             cursor: pointer;
-            display: block;
+            display: flex; /* Para alinhar texto e ícone */
+            align-items: center;
             text-align: center;
         }
 
@@ -103,6 +135,7 @@
             display: none; /* Oculta por padrão */
             max-height: 300px;
             overflow-y: auto;
+            margin-top: 5px;
         }
 
         #legend h3 {
@@ -120,38 +153,8 @@
         #legend img {
             max-width: 100%;
             height: auto;
-        }
-
-        /* Estilos para a Barra de Busca (Centralizada e Retrátil) */
-        #search-container {
-            position: absolute;
-            top: 10px;
-            left: 50%; /* Centraliza horizontalmente */
-            transform: translateX(-50%); /* Ajusta o posicionamento */
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center; /* Alinha verticalmente os elementos */
-        }
-
-        #search-container input[type="text"] {
-            padding: 8px;
-            border: none;
-            border-radius: 3px;
-            margin-right: 5px;
-            width: 200px;
-        }
-
-        #search-container button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 3px;
-            cursor: pointer;
+            display: block; /* Evita espaço extra abaixo da imagem */
+            margin-top: 3px;
         }
 
         /* Icone para retrátil e expandir */
@@ -164,27 +167,37 @@
 <body>
 <div id="map"></div>
 
-<!-- Controles Retráteis -->
-<div id="layer-switcher-container">
-    <div id="layer-switcher-toggle">Camadas <i class="fas fa-caret-down toggle-icon"></i></div>
+<!-- --- Contêiner Combinado Centralizado (APENAS CAMADAS) --- -->
+<div id="combined-control-container">
+    <!-- Linha superior APENAS com o toggle -->
+    <div id="combined-top-row">
+        <!-- Removido input de busca -->
+        <!-- Removido botão de busca -->
+        <!-- Botão Toggle do Layer Switcher -->
+        <div id="layer-switcher-toggle">
+            Camadas <i class="fas fa-caret-down toggle-icon"></i>
+        </div>
+    </div>
+    <!-- Lista de Camadas (oculta inicialmente) -->
     <div id="layer-switcher">
         <h3>Camadas</h3>
+        <!-- O conteúdo das camadas será populado pelo JS -->
     </div>
 </div>
 
+<!-- Controles Retráteis (Legenda permanece separada) -->
 <div id="legend-container">
     <div id="legend-toggle">Legenda <i class="fas fa-caret-down toggle-icon"></i></div>
     <div id="legend">
         <h3>Legenda</h3>
+        <!-- O conteúdo da legenda será populado pelo JS -->
     </div>
 </div>
 
-<div id="search-container">
-    <input type="text" id="search-input" placeholder="Buscar um local...">
-    <button id="search-button">Buscar</button>
-</div>
 
 <script>
+
+    // variáveis úteis (inicialização do mapa, dados das camadas, criação das WMS, etc.) ...
 
     var portaGeoserver = "8888";
     var urlGeoserver = "http://localhost:"+portaGeoserver+"/geoserver/";
@@ -224,41 +237,30 @@
         });
     }
 
-    // ---- MODIFICAÇÃO 1: Estrutura wmsLayers ----
-    // Armazenar um objeto com a camada e a descrição
     var wmsLayers = {}; // Armazenar as camadas WMS e suas descrições
 
-    layersData.layers.layer.forEach(function (layerInfo) { // Renomeado 'layer' para 'layerInfo' para clareza
+    layersData.layers.layer.forEach(function (layerInfo) {
         var layerName = layerInfo.name;
         var layerDescricao = layerInfo.descricao;
-        var wmsLayerObject = createWMSLayer(layerName); // O objeto da camada Leaflet
-        wmsLayers[layerName] = { // Armazena um objeto contendo a camada e a descrição
+        var wmsLayerObject = createWMSLayer(layerName);
+        wmsLayers[layerName] = {
             layer: wmsLayerObject,
             description: layerDescricao
         };
     });
-    // --------------------------------------------
 
-    // 5. Controles de Camada (Layer Switcher) - Criado Manualmente
-    var layerSwitcherDiv = document.getElementById('layer-switcher');
+    // 5. Controles de Camada (Layer Switcher) - Populando o div correto
+    var layerSwitcherDiv = document.getElementById('layer-switcher'); // Target correto
 
-    // ---- MODIFICAÇÃO 2: Atualizar populateLayerSwitcher ----
     function populateLayerSwitcher() {
-        // Limpa o conteúdo anterior (mantido)
-        // while (layerSwitcherDiv.firstChild) {
-        //     layerSwitcherDiv.removeChild(layerSwitcherDiv.firstChild);
-        // }
-        // Adiciona o cabeçalho (mantido como estava no HTML, não precisa recriar aqui)
-        // var title = document.createElement('h3');
-        // title.textContent = 'Camadas';
-        // layerSwitcherDiv.appendChild(title);
+         // Limpa apenas o conteúdo anterior dos checkboxes/labels, MANTÉM o H3
+        $(layerSwitcherDiv).find('label').remove(); // Remove labels anteriores
 
-
-        // Checkbox para a camada base OSM (mantido)
+        // Checkbox para a camada base OSM
         var osmLabel = document.createElement('label');
         var osmCheckbox = document.createElement('input');
         osmCheckbox.type = 'checkbox';
-        osmCheckbox.checked = map.hasLayer(osmLayer); // Verifica se a camada OSM está no mapa
+        osmCheckbox.checked = map.hasLayer(osmLayer);
         osmCheckbox.addEventListener('change', function() {
             if (osmCheckbox.checked) {
                 map.addLayer(osmLayer);
@@ -270,124 +272,68 @@
         osmLabel.appendChild(document.createTextNode(' OpenStreetMap'));
         layerSwitcherDiv.appendChild(osmLabel);
 
-        // Itera sobre as camadas WMS armazenadas em wmsLayers
+        // Itera sobre as camadas WMS
         for (var layerName in wmsLayers) {
-            // Recupera o objeto que contém a camada e a descrição
             var layerData = wmsLayers[layerName];
-            var layerObject = layerData.layer;       // A camada Leaflet real
-            var layerDescription = layerData.description; // A descrição da camada
+            var layerObject = layerData.layer;
+            var layerDescription = layerData.description;
 
-            // Usa uma closure para garantir que as variáveis corretas (layerObject, layerDescription)
-            // sejam usadas dentro do event listener do checkbox
             (function(currentLayerObject, currentLayerDescription) {
                 var label = document.createElement('label');
                 var checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                // Verifica se a *camada específica* está no mapa
                 checkbox.checked = map.hasLayer(currentLayerObject);
                 checkbox.addEventListener('change', function() {
                     if (checkbox.checked) {
-                        map.addLayer(currentLayerObject); // Adiciona/remove a camada correta
+                        map.addLayer(currentLayerObject);
                     } else {
                         map.removeLayer(currentLayerObject);
                     }
                 });
                 label.appendChild(checkbox);
-                // Usa a DESCRIÇÃO no texto do label
                 label.appendChild(document.createTextNode(' ' + currentLayerDescription));
                 layerSwitcherDiv.appendChild(label);
-            })(layerObject, layerDescription); // Passa a camada e a descrição para a closure
+            })(layerObject, layerDescription);
         }
     }
     populateLayerSwitcher();
-    // --------------------------------------------
 
-    // 6. Legenda (Dinâmica)
-    var legendDiv = document.getElementById('legend');
+
+    // 6. Legenda (Dinâmica) - Populando o div correto
+    var legendDiv = document.getElementById('legend'); // Target correto
 
     function getLegendUrl(layerName) {
-        // A URL da legenda ainda usa o nome técnico da camada (layerName)
         return urlGeoserver + "/mapas/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=mapas:" + layerName;
     }
 
-    // ---- MODIFICAÇÃO 3 (Opcional): Usar descrição na legenda ----
-    function populateLegend() {
-        // Limpa o conteúdo anterior (mantido)
-        // while (legendDiv.firstChild) {
-        //     legendDiv.removeChild(legendDiv.firstChild);
-        // }
-        // Adiciona o cabeçalho (mantido como estava no HTML)
-        // var title = document.createElement('h3');
-        // title.textContent = 'Legenda';
-        // legendDiv.appendChild(title);
+     function populateLegend() {
+        // Limpa apenas o conteúdo anterior das legendas, MANTÉM o H3
+        $(legendDiv).find('div').remove(); // Remove divs de legenda anteriores
 
-        // Itera sobre as camadas WMS
         for (var layerName in wmsLayers) {
-            var layerData = wmsLayers[layerName]; // Pega o objeto com layer e descrição
-            var layerDescription = layerData.description; // Pega a descrição
+            var layerData = wmsLayers[layerName];
+            var layerDescription = layerData.description;
+            var legendUrl = getLegendUrl(layerName);
 
-            var legendUrl = getLegendUrl(layerName); // A URL ainda precisa do nome técnico
             var img = document.createElement('img');
             img.src = legendUrl;
-            img.alt = "Legenda para " + layerDescription; // Usa descrição no alt text
+            img.alt = "Legenda para " + layerDescription;
+
             var layerLegendDiv = document.createElement('div');
-            // Usa a DESCRIÇÃO no título da legenda da camada
-            layerLegendDiv.innerHTML = "<strong>" + layerDescription + ":</strong><br>";
+            layerLegendDiv.innerHTML = "<strong>" + layerDescription + ":</strong>"; // Removido <br>
             layerLegendDiv.appendChild(img);
             legendDiv.appendChild(layerLegendDiv);
         }
     }
     populateLegend();
-    // ---------------------------------------------------------
-
-    // 7. Barra de Busca (Usando leaflet-control-geocoder)
-    L.Control.geocoder({ defaultMarkGeocode: false }) // Adicionado para não marcar automaticamente
-      .on('markgeocode', function(e) {
-          var bbox = e.geocode.bbox;
-          var poly = L.polygon([
-              bbox.getSouthEast(),
-              bbox.getNorthEast(),
-              bbox.getNorthWest(),
-              bbox.getSouthWest()
-          ]).addTo(map);
-          map.fitBounds(poly.getBounds());
-      })
-      .addTo(map);
-
-    // Integração com o botão de busca manual (se desejar manter)
-    var geocoderControl = L.Control.Geocoder.nominatim(); // Instancia o geocoder
-    document.getElementById('search-button').addEventListener('click', function() {
-        var query = document.getElementById('search-input').value;
-        if (query) {
-            geocoderControl.geocode(query, function(results) {
-                if (results && results.length > 0) {
-                    var result = results[0]; // Pega o primeiro resultado
-                     var bbox = result.bbox;
-                     var poly = L.polygon([
-                       bbox.getSouthEast(),
-                       bbox.getNorthEast(),
-                       bbox.getNorthWest(),
-                       bbox.getSouthWest()
-                     ]);
-                     map.fitBounds(poly.getBounds()); // Ajusta o mapa aos limites do resultado
-
-                    // Opcional: Adicionar um marcador
-                    // L.marker(result.center).bindPopup(result.name).addTo(map).openPopup();
-                } else {
-                    alert('Local não encontrado.');
-                }
-            });
-        }
-    });
-     // Permite buscar pressionando Enter no campo de input
-    document.getElementById('search-input').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            document.getElementById('search-button').click(); // Simula o clique no botão
-        }
-    });
 
 
-    // 8. Geolocalização (mantido)
+    // 7. Barra de Busca (REMOVIDA)
+    // Código do L.Control.geocoder removido
+    // Código dos listeners para #search-button e #search-input removido
+
+
+    // 8. Geolocalização (MANTIDO)
     map.locate({setView: true, maxZoom: 16});
 
     function onLocationFound(e) {
@@ -399,57 +345,48 @@
 
     function onLocationError(e) {
         console.warn("Erro de geolocalização: " + e.message);
-        // alert(e.message); // Pode ser irritante para o usuário
     }
 
     map.on('locationfound', onLocationFound);
     map.on('locationerror', onLocationError);
 
     // 9. Update Position (mantido, mas comentado)
-    // var marker = L.marker([-23.5505, -46.6333]).addTo(map);
-    // function updatePosition() {
-    //     $.ajax({
-    //         url: "/update-position",
-    //         success: function (data) {
-    //             var lat = data.latitude;
-    //             var lon = data.longitude;
-    //             marker.setLatLng([lat, lon]);
-    //             map.panTo([lat, lon]);
-    //         }
-    //     });
-    // }
-    //setInterval(updatePosition, 5000);
+     var marker = L.marker([-23.5505, -46.6333]).addTo(map);
+     function updatePosition() {
+         $.ajax({
+             url: "/update-position",
+             success: function (data) {
+                 var lat = data.latitude;
+                 var lon = data.longitude;
+                 marker.setLatLng([lat, lon]);
+                 map.panTo([lat, lon]);
+             }
+         });
+     }
+    setInterval(updatePosition, 5000);
 
-    // Controles Retráteis (mantido)
+
+    // --- AJUSTADO: Controles Retráteis ---
     $(document).ready(function() {
-        // Função para alternar ícone
+        // Função para alternar ícone (genérica)
         function toggleIcon(buttonElement) {
             var icon = $(buttonElement).find('.toggle-icon');
-            if (icon.hasClass('fa-caret-down')) {
-                icon.removeClass('fa-caret-down').addClass('fa-caret-up');
-            } else {
-                icon.removeClass('fa-caret-up').addClass('fa-caret-down');
-            }
+            icon.toggleClass('fa-caret-down fa-caret-up'); // Alterna as classes
         }
 
+        // Toggle para o Layer Switcher (dentro do contêiner combinado)
         $("#layer-switcher-toggle").click(function() {
+            // Faz slide APENAS da lista de camadas (#layer-switcher)
             $("#layer-switcher").slideToggle("slow");
-            toggleIcon(this); // 'this' refere-se ao elemento clicado
+            toggleIcon(this); // 'this' refere-se ao #layer-switcher-toggle clicado
         });
 
+        // Toggle para a Legenda (continua funcionando independentemente)
         $("#legend-toggle").click(function() {
             $("#legend").slideToggle("slow");
-            toggleIcon(this); // 'this' refere-se ao elemento clicado
+            toggleIcon(this); // 'this' refere-se ao #legend-toggle clicado
         });
 
-        // Adiciona o título 'Camadas' e 'Legenda' dinamicamente se não existir,
-        // para evitar que sejam removidos pelo 'populate' se você descomentar a limpeza.
-        if ($("#layer-switcher h3").length === 0) {
-             $("#layer-switcher").prepend("<h3>Camadas</h3>");
-        }
-        if ($("#legend h3").length === 0) {
-             $("#legend").prepend("<h3>Legenda</h3>");
-        }
 
     });
 </script>
