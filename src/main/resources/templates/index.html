@@ -351,19 +351,19 @@
     map.on('locationerror', onLocationError);
 
     // 9. Update Position (mantido, mas comentado)
-     var marker = L.marker([-23.5505, -46.6333]).addTo(map);
-     function updatePosition() {
-         $.ajax({
-             url: "/update-position",
-             success: function (data) {
-                 var lat = data.latitude;
-                 var lon = data.longitude;
-                 marker.setLatLng([lat, lon]);
-                 map.panTo([lat, lon]);
-             }
-         });
-     }
-    setInterval(updatePosition, 5000);
+    // var marker = L.marker([-23.5505, -46.6333]).addTo(map);
+    // function updatePosition() {
+    //     $.ajax({
+    //         url: "/update-position",
+    //         success: function (data) {
+    //             var lat = data.latitude;
+    //             var lon = data.longitude;
+    //             marker.setLatLng([lat, lon]);
+    //             map.panTo([lat, lon]);
+    //         }
+    //     });
+    // }
+    // setInterval(updatePosition, 5000);
 
 
     // --- AJUSTADO: Controles Retráteis ---
