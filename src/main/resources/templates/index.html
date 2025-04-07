@@ -185,6 +185,11 @@
 </div>
 
 <script>
+
+    var portaGeoserver = "8888";
+    var urlGeoserver = "http://localhost:"+portaGeoserver+"/geoserver/";
+    var urlGeoserverLayers = urlGeoserver + "rest/workspaces/";
+
     // 1. Inicialização do Mapa
     var map = L.map('map').setView([-23.5505, -46.6333], 7);
 
@@ -193,12 +198,13 @@
 
     // 2. Dados das Camadas (JSON INJETADO)
     var layersData = {"layers":{"layer":[
-        {"name":"tb_aldeias_pontos","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_aldeias_pontos.json"},
-        {"name":"tb_quilombolas","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_quilombolas.json"},
-        {"name":"tb_tis_amazonia_legal_poligonais","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_tis_amazonia_legal_poligonais.json"},
-        {"name":"tb_tis_pontos","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_tis_pontos.json"},
-        {"name":"tb_uf","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_uf.json"},
-        {"name":"tb_tis_poligonais","href":"http://localhost:8080/geoserver/rest/workspaces/mapas/layers/tb_tis_poligonais.json"}
+        {"descricao": "Aldeias Indígenas (Pontos)", "name":"tb_aldeias_pontos","href": urlGeoserverLayers +  "mapas/layers/tb_aldeias_pontos.json"},
+        {"descricao": "Terra de Quilombos  (Polígonos)","name":"tb_quilombolas","href":urlGeoserverLayers + "mapas/layers/tb_quilombolas.json"},
+        {"descricao": "Territórios Indígenas da Amazônia Legal (Polígonos)","name":"tb_tis_amazonia_legal_poligonais","href": urlGeoserverLayers + "mapas/layers/tb_tis_amazonia_legal_poligonais.json"},
+        {"descricao": "Territórios Indígenas (Pontos)","name":"tb_tis_pontos","href": urlGeoserverLayers + "mapas/layers/tb_tis_pontos.json"},
+        {"descricao": "Unidades da Federação (Polígonos)","name":"tb_uf","href": urlGeoserverLayers + "mapas/layers/tb_uf.json"},
+        {"descricao": "Territórios Indígenas (Polígonos)","name":"tb_tis_poligonais","href": urlGeoserverLayers + "mapas/layers/tb_tis_poligonais.json"},
+        {"descricao": "Unidades de Conservação (Polígonos)","name":"ucs","href": urlGeoserverLayers + "mapas/layers/ucs.json"}
     ]}};
 
     // 3. Camada Base (OpenStreetMap)
@@ -208,7 +214,7 @@
 
     // 4. Criação das Camadas WMS (GeoServer)
     function createWMSLayer(layerName) {
-        return L.tileLayer.wms("http://localhost:8080/geoserver/mapas/wms", {
+        return L.tileLayer.wms(urlGeoserver + "mapas/wms", {
             layers: 'mapas:' + layerName,
             format: 'image/png',
             transparent: true,
@@ -218,134 +224,233 @@
         });
     }
 
-    var wmsLayers = {}; // Armazenar as camadas WMS
+    // ---- MODIFICAÇÃO 1: Estrutura wmsLayers ----
+    // Armazenar um objeto com a camada e a descrição
+    var wmsLayers = {}; // Armazenar as camadas WMS e suas descrições
 
-    layersData.layers.layer.forEach(function (layer) {
-        var layerName = layer.name;
-        var wmsLayer = createWMSLayer(layerName);
-        wmsLayers[layerName] = wmsLayer; // Armazena a camada
+    layersData.layers.layer.forEach(function (layerInfo) { // Renomeado 'layer' para 'layerInfo' para clareza
+        var layerName = layerInfo.name;
+        var layerDescricao = layerInfo.descricao;
+        var wmsLayerObject = createWMSLayer(layerName); // O objeto da camada Leaflet
+        wmsLayers[layerName] = { // Armazena um objeto contendo a camada e a descrição
+            layer: wmsLayerObject,
+            description: layerDescricao
+        };
     });
+    // --------------------------------------------
 
     // 5. Controles de Camada (Layer Switcher) - Criado Manualmente
-
     var layerSwitcherDiv = document.getElementById('layer-switcher');
 
+    // ---- MODIFICAÇÃO 2: Atualizar populateLayerSwitcher ----
+    function populateLayerSwitcher() {
+        // Limpa o conteúdo anterior (mantido)
+        // while (layerSwitcherDiv.firstChild) {
+        //     layerSwitcherDiv.removeChild(layerSwitcherDiv.firstChild);
+        // }
+        // Adiciona o cabeçalho (mantido como estava no HTML, não precisa recriar aqui)
+        // var title = document.createElement('h3');
+        // title.textContent = 'Camadas';
+        // layerSwitcherDiv.appendChild(title);
 
-        function populateLayerSwitcher() {
-            while (layerSwitcherDiv.firstChild) {
-                layerSwitcherDiv.removeChild(layerSwitcherDiv.firstChild);
+
+        // Checkbox para a camada base OSM (mantido)
+        var osmLabel = document.createElement('label');
+        var osmCheckbox = document.createElement('input');
+        osmCheckbox.type = 'checkbox';
+        osmCheckbox.checked = map.hasLayer(osmLayer); // Verifica se a camada OSM está no mapa
+        osmCheckbox.addEventListener('change', function() {
+            if (osmCheckbox.checked) {
+                map.addLayer(osmLayer);
+            } else {
+                map.removeLayer(osmLayer);
             }
+        });
+        osmLabel.appendChild(osmCheckbox);
+        osmLabel.appendChild(document.createTextNode(' OpenStreetMap'));
+        layerSwitcherDiv.appendChild(osmLabel);
 
-            var osmLabel = document.createElement('label');
-            var osmCheckbox = document.createElement('input');
-            osmCheckbox.type = 'checkbox';
-            osmCheckbox.checked = true;
-            osmCheckbox.addEventListener('change', function() {
-                if (osmCheckbox.checked) {
-                    map.addLayer(osmLayer);
-                } else {
-                    map.removeLayer(osmLayer);
-                }
-            });
-            osmLabel.appendChild(osmCheckbox);
-            osmLabel.appendChild(document.createTextNode(' OpenStreetMap'));
-            layerSwitcherDiv.appendChild(osmLabel);
+        // Itera sobre as camadas WMS armazenadas em wmsLayers
+        for (var layerName in wmsLayers) {
+            // Recupera o objeto que contém a camada e a descrição
+            var layerData = wmsLayers[layerName];
+            var layerObject = layerData.layer;       // A camada Leaflet real
+            var layerDescription = layerData.description; // A descrição da camada
 
-            for (var layerName in wmsLayers) {
-                (function(layer) { // Closure para "congelar" o valor de layer
-                    var label = document.createElement('label');
-                    var checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.checked = map.hasLayer(layer);
-                    checkbox.addEventListener('change', function() {
-                        if (checkbox.checked) {
-                            map.addLayer(layer);
-                        } else {
-                            map.removeLayer(layer);
-                        }
-                    });
-                    label.appendChild(checkbox);
-                    label.appendChild(document.createTextNode(' ' + layerName));
-                    layerSwitcherDiv.appendChild(label);
-                })(wmsLayers[layerName]); // Passa o valor atual de layer para a closure
-            }
+            // Usa uma closure para garantir que as variáveis corretas (layerObject, layerDescription)
+            // sejam usadas dentro do event listener do checkbox
+            (function(currentLayerObject, currentLayerDescription) {
+                var label = document.createElement('label');
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                // Verifica se a *camada específica* está no mapa
+                checkbox.checked = map.hasLayer(currentLayerObject);
+                checkbox.addEventListener('change', function() {
+                    if (checkbox.checked) {
+                        map.addLayer(currentLayerObject); // Adiciona/remove a camada correta
+                    } else {
+                        map.removeLayer(currentLayerObject);
+                    }
+                });
+                label.appendChild(checkbox);
+                // Usa a DESCRIÇÃO no texto do label
+                label.appendChild(document.createTextNode(' ' + currentLayerDescription));
+                layerSwitcherDiv.appendChild(label);
+            })(layerObject, layerDescription); // Passa a camada e a descrição para a closure
         }
+    }
     populateLayerSwitcher();
+    // --------------------------------------------
 
     // 6. Legenda (Dinâmica)
     var legendDiv = document.getElementById('legend');
 
     function getLegendUrl(layerName) {
-        return "http://localhost:8080/geoserver/mapas/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=mapas:" + layerName;
+        // A URL da legenda ainda usa o nome técnico da camada (layerName)
+        return urlGeoserver + "/mapas/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=mapas:" + layerName;
     }
 
+    // ---- MODIFICAÇÃO 3 (Opcional): Usar descrição na legenda ----
     function populateLegend() {
-        while (legendDiv.firstChild) {
-            legendDiv.removeChild(legendDiv.firstChild);
-        }
+        // Limpa o conteúdo anterior (mantido)
+        // while (legendDiv.firstChild) {
+        //     legendDiv.removeChild(legendDiv.firstChild);
+        // }
+        // Adiciona o cabeçalho (mantido como estava no HTML)
+        // var title = document.createElement('h3');
+        // title.textContent = 'Legenda';
+        // legendDiv.appendChild(title);
 
+        // Itera sobre as camadas WMS
         for (var layerName in wmsLayers) {
-            var legendUrl = getLegendUrl(layerName);
+            var layerData = wmsLayers[layerName]; // Pega o objeto com layer e descrição
+            var layerDescription = layerData.description; // Pega a descrição
+
+            var legendUrl = getLegendUrl(layerName); // A URL ainda precisa do nome técnico
             var img = document.createElement('img');
             img.src = legendUrl;
-            img.alt = "Legenda para " + layerName;
+            img.alt = "Legenda para " + layerDescription; // Usa descrição no alt text
             var layerLegendDiv = document.createElement('div');
-            layerLegendDiv.innerHTML = "<strong>" + layerName + ":</strong><br>";
+            // Usa a DESCRIÇÃO no título da legenda da camada
+            layerLegendDiv.innerHTML = "<strong>" + layerDescription + ":</strong><br>";
             layerLegendDiv.appendChild(img);
             legendDiv.appendChild(layerLegendDiv);
         }
     }
-
     populateLegend();
+    // ---------------------------------------------------------
 
     // 7. Barra de Busca (Usando leaflet-control-geocoder)
-    L.Control.geocoder().addTo(map);
+    L.Control.geocoder({ defaultMarkGeocode: false }) // Adicionado para não marcar automaticamente
+      .on('markgeocode', function(e) {
+          var bbox = e.geocode.bbox;
+          var poly = L.polygon([
+              bbox.getSouthEast(),
+              bbox.getNorthEast(),
+              bbox.getNorthWest(),
+              bbox.getSouthWest()
+          ]).addTo(map);
+          map.fitBounds(poly.getBounds());
+      })
+      .addTo(map);
 
-    // 8. Geolocalização
+    // Integração com o botão de busca manual (se desejar manter)
+    var geocoderControl = L.Control.Geocoder.nominatim(); // Instancia o geocoder
+    document.getElementById('search-button').addEventListener('click', function() {
+        var query = document.getElementById('search-input').value;
+        if (query) {
+            geocoderControl.geocode(query, function(results) {
+                if (results && results.length > 0) {
+                    var result = results[0]; // Pega o primeiro resultado
+                     var bbox = result.bbox;
+                     var poly = L.polygon([
+                       bbox.getSouthEast(),
+                       bbox.getNorthEast(),
+                       bbox.getNorthWest(),
+                       bbox.getSouthWest()
+                     ]);
+                     map.fitBounds(poly.getBounds()); // Ajusta o mapa aos limites do resultado
+
+                    // Opcional: Adicionar um marcador
+                    // L.marker(result.center).bindPopup(result.name).addTo(map).openPopup();
+                } else {
+                    alert('Local não encontrado.');
+                }
+            });
+        }
+    });
+     // Permite buscar pressionando Enter no campo de input
+    document.getElementById('search-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('search-button').click(); // Simula o clique no botão
+        }
+    });
+
+
+    // 8. Geolocalização (mantido)
     map.locate({setView: true, maxZoom: 16});
 
     function onLocationFound(e) {
         var radius = e.accuracy / 2;
-
         L.marker(e.latlng).addTo(map)
-            .bindPopup("Você está aqui com " + radius + " metros de precisão").openPopup();
-
+            .bindPopup("Você está aqui com aproximadamente " + radius.toFixed(0) + " metros de precisão.").openPopup();
         L.circle(e.latlng, radius).addTo(map);
     }
 
     function onLocationError(e) {
-        alert(e.message);
+        console.warn("Erro de geolocalização: " + e.message);
+        // alert(e.message); // Pode ser irritante para o usuário
     }
 
     map.on('locationfound', onLocationFound);
     map.on('locationerror', onLocationError);
 
-    // 9. Update Position (Mantendo a lógica do Leaflet)
-    var marker = L.marker([-23.5505, -46.6333]).addTo(map);
-
-    function updatePosition() {
-        $.ajax({
-            url: "/update-position",
-            success: function (data) {
-                var lat = data.latitude;
-                var lon = data.longitude;
-                marker.setLatLng([lat, lon]);
-                map.panTo([lat, lon]);
-            }
-        });
-    }
-
+    // 9. Update Position (mantido, mas comentado)
+    // var marker = L.marker([-23.5505, -46.6333]).addTo(map);
+    // function updatePosition() {
+    //     $.ajax({
+    //         url: "/update-position",
+    //         success: function (data) {
+    //             var lat = data.latitude;
+    //             var lon = data.longitude;
+    //             marker.setLatLng([lat, lon]);
+    //             map.panTo([lat, lon]);
+    //         }
+    //     });
+    // }
     //setInterval(updatePosition, 5000);
 
-    // Controles Retráteis
+    // Controles Retráteis (mantido)
     $(document).ready(function() {
+        // Função para alternar ícone
+        function toggleIcon(buttonElement) {
+            var icon = $(buttonElement).find('.toggle-icon');
+            if (icon.hasClass('fa-caret-down')) {
+                icon.removeClass('fa-caret-down').addClass('fa-caret-up');
+            } else {
+                icon.removeClass('fa-caret-up').addClass('fa-caret-down');
+            }
+        }
+
         $("#layer-switcher-toggle").click(function() {
             $("#layer-switcher").slideToggle("slow");
+            toggleIcon(this); // 'this' refere-se ao elemento clicado
         });
 
         $("#legend-toggle").click(function() {
             $("#legend").slideToggle("slow");
+            toggleIcon(this); // 'this' refere-se ao elemento clicado
         });
+
+        // Adiciona o título 'Camadas' e 'Legenda' dinamicamente se não existir,
+        // para evitar que sejam removidos pelo 'populate' se você descomentar a limpeza.
+        if ($("#layer-switcher h3").length === 0) {
+             $("#layer-switcher").prepend("<h3>Camadas</h3>");
+        }
+        if ($("#legend h3").length === 0) {
+             $("#legend").prepend("<h3>Legenda</h3>");
+        }
+
     });
 </script>
 </body>
