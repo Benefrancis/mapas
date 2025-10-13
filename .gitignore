@@ -35,6 +35,11 @@ build/
 # Backup das tabelas
 /documentos_do_projeto/database/
 
-/dados/
+/documentos/
+/mpf-db/
+/mpf-geo/
+/mpf-grafana/
+/mpf-logs/
+
 
 *.sqlc

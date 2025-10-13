@@ -1,6 +1,7 @@
 package br.com.benefrancis.mapas.controller;
 
 import br.com.benefrancis.mapas.service.UnidadeConservacaoService;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger; // Import Logger
 import org.slf4j.LoggerFactory; // Import LoggerFactory
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.SecureRandom;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,14 +28,14 @@ public class UnidadeConservacaoController {
     private final UnidadeConservacaoService unidadeConservacaoService;
     // Considerar tornar o ExecutorService um bean gerenciado pelo Spring se a aplicação crescer
     private final ExecutorService executorService = Executors.newFixedThreadPool(2);
-    private final Random random = new Random();
+    private final SecureRandom random = new SecureRandom();
 
     @Transactional
     // A anotação aqui pode não ter o efeito desejado em operações assíncronas. A transação principal está no Service.
     @GetMapping("/import")
     public ResponseEntity<String> importData(
-            @RequestParam(defaultValue = "11880") int startId,
-            @RequestParam(defaultValue = "11883") int endId) {
+            @RequestParam(defaultValue = "11880") @Pattern(regexp = "^[0-9]+$") int startId,
+            @RequestParam(defaultValue = "11883") @Pattern(regexp = "^[0-9]+$") int endId) {
 
         logger.info("Iniciando submissão de tarefas para importação de IDs {} a {}", startId, endId);
 

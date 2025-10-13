@@ -91,8 +91,9 @@ public class UnidadeConservacaoService {
             logger.error("Falha ao parsear dados para UC ID: {}. Causa: {}", id, e.getMessage(), e);
         } catch (DataAccessException e) {
             logger.error("Erro de persistência no banco de dados para UC ID: {}", id, e);
-        } catch (Exception e) {
-            logger.error("Erro inesperado e não classificado ao processar UC ID: {}", id, e);
+        } catch (RuntimeException e) {
+            logger.error("Erro inesperado ao processar UC ID: {}", id, e);
+            throw e; // Re-throw the exception after logging
         }
     }
 
@@ -130,9 +131,6 @@ public class UnidadeConservacaoService {
                 Thread.currentThread().interrupt();
             }
             throw new ApiFetchException("Erro de comunicação com a API para UC ID: " + id, e);
-        } catch (Exception e) {
-            logger.error("Erro inesperado durante fetch para UC ID: {}", id, e);
-            throw new ApiFetchException("Erro inesperado durante fetch para UC ID: " + id, e);
         }
     }
 
@@ -740,7 +738,7 @@ public class UnidadeConservacaoService {
                     try {
                         return Integer.parseInt(textValue);
                     } catch (NumberFormatException e) {
-                        logger.warn("Não foi possível converter '{}' ({}) para Integer na UC ID {}.", textValue, fieldName, node.path("uc_id").asText("N/A"));
+                        logger.warn("Não foi possível converter '{}' ({}) para Integer na UC ID {}.", textValue, fieldName, node.path("uc_id").asText("N/A"), e);
                     }
                 }
             }

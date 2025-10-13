@@ -1,4 +1,4 @@
-version: "3.8"
+## version: "3.8"
 
 networks:
   net4mapas:
@@ -33,8 +33,8 @@ services:
     volumes:
       - ./src/main/resources/templates:/templates
       - ./src/main/resources/static:/static
-      - f:/${POSTGRES_NAME:-mapas}/logs:/data/logs/mapas
-      - f:/${POSTGRES_NAME:-mapas}/assets:/assets
+      - ./mpf-logs/${POSTGRES_NAME:-mapas}:/data/logs/mapas
+      - ./mpf-assets/${POSTGRES_NAME:-mapas}${POSTGRES_NAME:-mapas}/assets:/assets
     command: java -jar /app/mapas.jar # Comando para iniciar sua aplicação
     networks:
       - net4${POSTGRES_NAME:-mapas}
@@ -67,12 +67,12 @@ services:
       GRIB_CACHE_DIR: /var/lib/grib
       ALLOWED_ORIGINS: http://localhost,http://territoriostradicionais.mpf.mp.br,https://territoriostradicionais.mpf.mp.br # Suas origens permitidas
     volumes:
-      - f:/${POSTGRES_NAME:-mapas}/logs:/var/log/geoserver
-      - f:/${POSTGRES_NAME:-mapas}/datadir:/var/lib/geoserver_data
-      - f:/${POSTGRES_NAME:-mapas}/gwc_config:/var/lib/geowebcache/config
-      - f:/${POSTGRES_NAME:-mapas}/gwc:/var/lib/geowebcache/cache
-      - f:/${POSTGRES_NAME:-mapas}/netcfd:/var/lib/netcdf
-      - f:/${POSTGRES_NAME:-mapas}/grib_cache:/var/lib/grib
+      - ./mpf-geo/${POSTGRES_NAME:-mapas}/geoserver:/var/log/geoserver
+      - ./mpf-geo/${POSTGRES_NAME:-mapas}/geoserver/datadir:/var/lib/geoserver_data
+      - ./mpf-geo/${POSTGRES_NAME:-mapas}/geoserver/gwc_config:/var/lib/geowebcache/config
+      - ./mpf-geo/${POSTGRES_NAME:-mapas}/geoserver/gwc:/var/lib/geowebcache/cache
+      - ./mpf-geo/${POSTGRES_NAME:-mapas}/geoserver/netcfd:/var/lib/netcdf
+      - ./mpf-geo/${POSTGRES_NAME:-mapas}/geoserver/grib_cache:/var/lib/grib
       - ./context.xml:/opt/tomcat/conf/Catalina/localhost/geoserver.xml # mapeamento para o seu context.xml
       #      - ./web.xml:/opt/tomcat/webapps/geoserver/WEB-INF/web.xml
       - ./web.xml.template:/opt/tomcat/webapps/geoserver/WEB-INF/web.xml.template
@@ -120,7 +120,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - f:/${POSTGRES_NAME:-mapas}/data_pg:/var/lib/postgresql/data
+      - ./mpf-db/${POSTGRES_NAME:-mapas}/data:/var/lib/postgresql/data
     networks:
       - net4${POSTGRES_NAME:-mapas}
     healthcheck:
@@ -179,7 +179,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - f:/${POSTGRES_NAME:-mapas}/grafana_data:/var/lib/grafana
+      - ./mpf-grafana/${POSTGRES_NAME:-mapas}/data:/var/lib/grafana
     networks:
       - net4${POSTGRES_NAME:-mapas}
     depends_on:
