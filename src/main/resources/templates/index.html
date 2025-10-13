@@ -1,29 +1,60 @@
+<!-- main/resources/templates/index.html -->
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Mapa com Leaflet</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Removido link e script do leaflet-control-geocoder -->
-    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/> -->
-    <!-- <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script> -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-          integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador de Mapas Geoespaciais</title>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Vue.js 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <!-- SortableJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Google Fonts: Roboto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
     <style>
-        /* Fonte Roboto */
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        :root {
+            --glass-background: rgba(245, 245, 247, 0.65); /* Fundo mais claro, "aurora" */
+            --glass-border: 1px solid rgba(255, 255, 255, 0.4);
+            --text-primary: #1a1a1a; /* Texto escuro para contraste */
+            --text-secondary: #555;
+            --accent-color: #007aff;
+            --sidebar-width: 380px;
+            --transition-speed: 0.4s;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
 
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: "Roboto", sans-serif;
             margin: 0;
+            padding: 0;
             overflow: hidden;
+            background-color: #f0f0f0;
+        }
+
+        #app {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
         }
 
         #map {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
@@ -31,364 +62,336 @@
             z-index: 1;
         }
 
-        /* Estilos para os controles */
-        .leaflet-control-container {
-            z-index: 1000;
+        .glass-panel {
+            background: var(--glass-background);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: var(--glass-border);
+            transition: all var(--transition-speed) ease;
         }
 
-        /* --- Contêiner Centralizado (Apenas Seletor de Camadas) --- */
-        #combined-control-container {
+        aside {
             position: absolute;
-            top: 10px;
-            left: 50%; /* Centraliza horizontalmente */
-            transform: translateX(-50%); /* Ajusta o posicionamento */
-            z-index: 1001; /* Acima dos outros controles leaflet */
-            background: rgba(255, 255, 255, 0.8);
-            padding: 8px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column; /* Itens empilhados verticalmente */
-            align-items: center; /* Centraliza o botão de toggle horizontalmente */
-            max-width: 350px; /* Limita a largura máxima */
-        }
-
-        /* Linha superior contendo APENAS o toggle */
-        #combined-top-row {
-            display: flex; /* Mantido flex para consistência, mas com um item */
-            justify-content: center; /* Centraliza o botão dentro da linha */
-            width: 100%; /* Ocupa toda a largura do container pai */
-            margin-bottom: 5px; /* Espaço antes da lista de camadas, se aberta */
-        }
-
-        /* Removidos estilos do input e button de busca */
-
-        /* Estilos para o Botão Toggle do Layer Switcher (dentro do combinado) */
-        #layer-switcher-toggle {
-            background-color: #f0f0f0; /* Um fundo leve para destacar */
-            padding: 8px 10px;
-            border-radius: 3px; /* Consistente com outros botões */
-            cursor: pointer;
-            display: flex; /* Para alinhar texto e ícone */
-            align-items: center;
-            text-align: center;
-            font-size: 0.9em;
-            white-space: nowrap; /* Evita quebra de linha */
-            /* flex-shrink: 0; */ /* Não é mais estritamente necessário com um item */
-        }
-
-        /* Estilos para o Layer Switcher (a lista, dentro do combinado) */
-        #layer-switcher {
-            padding: 10px;
-            display: none; /* Oculta por padrão */
-            margin-top: 5px; /* Espaço acima da lista quando aberta */
-            border-top: 1px solid #ccc; /* Linha separadora */
-            max-height: 250px; /* Altura máxima para a lista */
-            overflow-y: auto; /* Scroll se necessário */
-            width: 100%; /* Faz a lista ocupar a largura do container */
-            box-sizing: border-box; /* Inclui padding na largura */
-        }
-
-        #layer-switcher h3 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-            font-weight: 500;
-            text-align: center;
-        }
-
-        #layer-switcher label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 0.95em;
-        }
-
-        #layer-switcher input[type="checkbox"] {
-            margin-right: 8px;
-        }
-
-
-        /* Estilos para a Legenda (Mantido como antes) */
-        #legend-container {
-            position: absolute;
+            top: 20px; /* Espaçamento do topo */
+            left: 20px;
             bottom: 20px;
-            right: 10px;
+            width: var(--sidebar-width);
             z-index: 1000;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            transform: translateX(0);
         }
 
-        #legend-toggle {
-            background: rgba(255, 255, 255, 0.8);
-            padding: 5px 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            display: flex; /* Para alinhar texto e ícone */
+        aside.collapsed {
+            transform: translateX(calc(-1 * var(--sidebar-width) - 20px));
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: calc(100% + 10px);
+            width: 36px;
+            height: 36px;
+            display: flex;
             align-items: center;
-            text-align: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1em;
+            color: var(--text-primary);
+            border-radius: 50%;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        #legend {
-            background: rgba(255, 255, 255, 0.8);
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            display: none; /* Oculta por padrão */
-            max-height: 300px;
-            overflow-y: auto;
-            margin-top: 5px;
+        .sidebar-toggle i {
+            transition: transform var(--transition-speed) ease;
         }
 
-        #legend h3 {
+        aside.collapsed .sidebar-toggle i {
+            transform: rotate(180deg);
+        }
+
+        .sidebar-header h2 {
             margin-top: 0;
-            margin-bottom: 5px;
-            font-size: 1.2em;
+            margin-bottom: 20px;
+            font-size: 1.6em;
             font-weight: 500;
+            color: var(--text-primary);
         }
 
-        #legend div {
-            margin-bottom: 10px;
-            text-align: left;
+        /* --- Caixa de Busca --- */
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
         }
 
-        #legend img {
-            max-width: 100%;
-            height: auto;
-            display: block; /* Evita espaço extra abaixo da imagem */
-            margin-top: 3px;
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
         }
 
-        /* Icone para retrátil e expandir */
-        .toggle-icon {
-            margin-left: 5px; /* Espaço entre o texto e o ícone */
-            cursor: pointer; /* Muda o cursor para indicar que é clicável */
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.5);
+            font-family: "Roboto", sans-serif;
+            font-size: 1em;
+            font-weight: 300;
+            transition: all 0.2s ease;
         }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+        }
+
+        /* --- Lista de Camadas --- */
+        #layer-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+            overflow-y: auto;
+            /* Estilo da scrollbar */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0,0,0,0.2) transparent;
+        }
+
+        #layer-list::-webkit-scrollbar { width: 6px; }
+        #layer-list::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.2); border-radius: 3px; }
+
+        #layer-list li {
+            display: flex;
+            align-items: center;
+            padding: 10px 5px;
+            margin-bottom: 4px;
+            border-radius: 8px;
+            cursor: grab;
+            transition: background 0.2s ease;
+            font-weight: 300;
+        }
+
+        #layer-list li:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .sortable-ghost { opacity: 0.5; background: #c8ebfb; }
+        .drag-handle { margin: 0 10px; color: var(--text-secondary); cursor: grab; }
+        .drag-handle:active { cursor: grabbing; }
+
+        /* --- Checkbox Customizado --- */
+        .layer-label {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .layer-label input[type="checkbox"] { display: none; }
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #aaa;
+            border-radius: 5px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .custom-checkbox .fa-check {
+            font-size: 12px;
+            color: white;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.2s ease-in-out;
+        }
+        .layer-label input:checked + .custom-checkbox {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        .layer-label input:checked + .custom-checkbox .fa-check {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* --- Legenda --- */
+        .legend-section {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            max-height: 220px;
+            display: flex;
+            flex-direction: column;
+        }
+        .legend-section h3 { margin: 0 0 10px 0; font-weight: 500; }
+        #legend-container {
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0,0,0,0.2) transparent;
+        }
+        #legend-container::-webkit-scrollbar { width: 6px; }
+        #legend-container::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.2); border-radius: 3px; }
+        .legend-item { margin-bottom: 15px; }
+        .legend-item strong { display: block; margin-bottom: 5px; font-size: 0.9em; font-weight: 400; color: var(--text-secondary); }
+        .legend-item img { max-width: 100%; border-radius: 4px; }
     </style>
 </head>
 <body>
-<div id="map"></div>
 
-<!-- --- Contêiner Combinado Centralizado (APENAS CAMADAS) --- -->
-<div id="combined-control-container">
-    <!-- Linha superior APENAS com o toggle -->
-    <div id="combined-top-row">
-        <!-- Removido input de busca -->
-        <!-- Removido botão de busca -->
-        <!-- Botão Toggle do Layer Switcher -->
-        <div id="layer-switcher-toggle">
-            Camadas <i class="fas fa-caret-down toggle-icon"></i>
+<div id="app" v-cloak>
+    <aside :class="{ 'collapsed': isSidebarCollapsed }" class="glass-panel">
+        <button @click="toggleSidebar" class="sidebar-toggle glass-panel" aria-label="Alternar painel de camadas">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <div class="sidebar-header">
+            <h2>Camadas do Mapa</h2>
         </div>
-    </div>
-    <!-- Lista de Camadas (oculta inicialmente) -->
-    <div id="layer-switcher">
-        <h3>Camadas</h3>
-        <!-- O conteúdo das camadas será populado pelo JS -->
-    </div>
-</div>
 
-<!-- Controles Retráteis (Legenda permanece separada) -->
-<div id="legend-container">
-    <div id="legend-toggle">Legenda <i class="fas fa-caret-down toggle-icon"></i></div>
-    <div id="legend">
-        <h3>Legenda</h3>
-        <!-- O conteúdo da legenda será populado pelo JS -->
-    </div>
-</div>
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" v-model="searchQuery" placeholder="Buscar camada...">
+        </div>
 
+        <ul id="layer-list">
+            <li v-for="layer in filteredLayers" :key="layer.id">
+                <span class="drag-handle"><i class="fas fa-grip-vertical"></i></span>
+                <label class="layer-label">
+                    <input type="checkbox" v-model="layer.visible">
+                    <span class="custom-checkbox"><i class="fas fa-check"></i></span>
+                    {{ layer.description }}
+                </label>
+            </li>
+        </ul>
+
+        <div class="legend-section">
+            <h3>Legenda</h3>
+            <div id="legend-container">
+                <div v-for="layer in visibleLayers" :key="layer.id" class="legend-item">
+                    <strong>{{ layer.description }}</strong>
+                    <img :src="layer.legendUrl" :alt="'Legenda para ' + layer.description">
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div id="map"></div>
+</div>
 
 <script>
+    const { createApp, ref, onMounted, watch, computed } = Vue;
 
-    // variáveis úteis (inicialização do mapa, dados das camadas, criação das WMS, etc.) ...
+    createApp({
+        setup() {
+            const geoserverPort = "8888";
+            const geoserverUrl = `http://localhost:${geoserverPort}/geoserver/`;
+            const workspace = "mapas";
 
-    var portaGeoserver = "8888";
-    var urlGeoserver = "http://localhost:"+portaGeoserver+"/geoserver/";
-    var urlGeoserverLayers = urlGeoserver + "rest/workspaces/";
+            const isSidebarCollapsed = ref(false);
+            const layers = ref([]);
+            const searchQuery = ref('');
 
-    // 1. Inicialização do Mapa
-    var map = L.map('map').setView([-23.5505, -46.6333], 7);
+            let mapInstance = null;
+            let wmsLayerObjects = {};
 
-    // Adiciona escala
-    L.control.scale().addTo(map);
+            const initialLayersData = [
+                { id: 'tb_aldeias_pontos', description: "Aldeias Indígenas (Pontos)" },
+                { id: 'tb_quilombolas', description: "Terra de Quilombos (Polígonos)" },
+                { id: 'tb_tis_amazonia_legal_poligonais', description: "TIs Amazônia Legal (Polígonos)" },
+                { id: 'tb_tis_pontos', description: "Territórios Indígenas (Pontos)" },
+                { id: 'tb_uf', description: "Unidades da Federação (Polígonos)" },
+                { id: 'tb_tis_poligonais', description: "Territórios Indígenas (Polígonos)" },
+                { id: 'ucs', description: "Unidades de Conservação (Polígonos)" }
+            ];
 
-    // 2. Dados das Camadas (JSON INJETADO)
-    var layersData = {"layers":{"layer":[
-        {"descricao": "Aldeias Indígenas (Pontos)", "name":"tb_aldeias_pontos","href": urlGeoserverLayers +  "mapas/layers/tb_aldeias_pontos.json"},
-        {"descricao": "Terra de Quilombos  (Polígonos)","name":"tb_quilombolas","href":urlGeoserverLayers + "mapas/layers/tb_quilombolas.json"},
-        {"descricao": "Territórios Indígenas da Amazônia Legal (Polígonos)","name":"tb_tis_amazonia_legal_poligonais","href": urlGeoserverLayers + "mapas/layers/tb_tis_amazonia_legal_poligonais.json"},
-        {"descricao": "Territórios Indígenas (Pontos)","name":"tb_tis_pontos","href": urlGeoserverLayers + "mapas/layers/tb_tis_pontos.json"},
-        {"descricao": "Unidades da Federação (Polígonos)","name":"tb_uf","href": urlGeoserverLayers + "mapas/layers/tb_uf.json"},
-        {"descricao": "Territórios Indígenas (Polígonos)","name":"tb_tis_poligonais","href": urlGeoserverLayers + "mapas/layers/tb_tis_poligonais.json"},
-        {"descricao": "Unidades de Conservação (Polígonos)","name":"ucs","href": urlGeoserverLayers + "mapas/layers/ucs.json"}
-    ]}};
+            const toggleSidebar = () => {
+                isSidebarCollapsed.value = !isSidebarCollapsed.value;
+                setTimeout(() => mapInstance?.invalidateSize(), 400);
+            };
 
-    // 3. Camada Base (OpenStreetMap)
-    var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+            const createWMSLayer = (layerName) => L.tileLayer.wms(`${geoserverUrl}${workspace}/wms`, {
+                layers: `${workspace}:${layerName}`, format: 'image/png', transparent: true
+            });
 
-    // 4. Criação das Camadas WMS (GeoServer)
-    function createWMSLayer(layerName) {
-        return L.tileLayer.wms(urlGeoserver + "mapas/wms", {
-            layers: 'mapas:' + layerName,
-            format: 'image/png',
-            transparent: true,
-            version: '1.1.0',
-            tiled: true,
-            attribution: "GeoServer"
-        });
-    }
+            const getLegendUrl = (layerName) => `${geoserverUrl}${workspace}/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=${workspace}:${layerName}`;
 
-    var wmsLayers = {}; // Armazenar as camadas WMS e suas descrições
+            const filteredLayers = computed(() => {
+                if (!searchQuery.value) {
+                    return layers.value;
+                }
+                return layers.value.filter(layer =>
+                    layer.description.toLowerCase().includes(searchQuery.value.toLowerCase())
+                );
+            });
 
-    layersData.layers.layer.forEach(function (layerInfo) {
-        var layerName = layerInfo.name;
-        var layerDescricao = layerInfo.descricao;
-        var wmsLayerObject = createWMSLayer(layerName);
-        wmsLayers[layerName] = {
-            layer: wmsLayerObject,
-            description: layerDescricao
-        };
-    });
+            const visibleLayers = computed(() => layers.value.filter(layer => layer.visible));
 
-    // 5. Controles de Camada (Layer Switcher) - Populando o div correto
-    var layerSwitcherDiv = document.getElementById('layer-switcher'); // Target correto
+            onMounted(() => {
+                mapInstance = L.map('map').setView([-14.2350, -51.9253], 5);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                }).addTo(mapInstance);
+                L.control.scale({ imperial: false }).addTo(mapInstance);
 
-    function populateLayerSwitcher() {
-         // Limpa apenas o conteúdo anterior dos checkboxes/labels, MANTÉM o H3
-        $(layerSwitcherDiv).find('label').remove(); // Remove labels anteriores
+                layers.value = initialLayersData.map(layerInfo => {
+                    wmsLayerObjects[layerInfo.id] = createWMSLayer(layerInfo.id);
+                    return { ...layerInfo, visible: false, legendUrl: getLegendUrl(layerInfo.id) };
+                }).reverse();
 
-        // Checkbox para a camada base OSM
-        var osmLabel = document.createElement('label');
-        var osmCheckbox = document.createElement('input');
-        osmCheckbox.type = 'checkbox';
-        osmCheckbox.checked = map.hasLayer(osmLayer);
-        osmCheckbox.addEventListener('change', function() {
-            if (osmCheckbox.checked) {
-                map.addLayer(osmLayer);
-            } else {
-                map.removeLayer(osmLayer);
-            }
-        });
-        osmLabel.appendChild(osmCheckbox);
-        osmLabel.appendChild(document.createTextNode(' OpenStreetMap'));
-        layerSwitcherDiv.appendChild(osmLabel);
+                const el = document.getElementById('layer-list');
+                new Sortable(el, {
+                    handle: '.drag-handle',
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    onEnd: (evt) => {
+                        const movedItem = layers.value.find(l => l.id === evt.item.dataset.id);
+                        if (!movedItem) return;
 
-        // Itera sobre as camadas WMS
-        for (var layerName in wmsLayers) {
-            var layerData = wmsLayers[layerName];
-            var layerObject = layerData.layer;
-            var layerDescription = layerData.description;
+                        const newLayersOrder = Array.from(el.children).map(li => {
+                            return layers.value.find(l => l.id === li.dataset.id);
+                        });
 
-            (function(currentLayerObject, currentLayerDescription) {
-                var label = document.createElement('label');
-                var checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = map.hasLayer(currentLayerObject);
-                checkbox.addEventListener('change', function() {
-                    if (checkbox.checked) {
-                        map.addLayer(currentLayerObject);
-                    } else {
-                        map.removeLayer(currentLayerObject);
+                        // O SortableJS já reordenou o DOM. Precisamos reordenar o array `layers`
+                        // de acordo com o `filteredLayers` atualizado, mas aplicando a todos os itens.
+                        // Esta é uma lógica complexa quando há filtro. A forma mais robusta é reordenar o array principal.
+                        const itemToMove = layers.value.splice(evt.oldDraggableIndex, 1)[0];
+                        layers.value.splice(evt.newDraggableIndex, 0, itemToMove);
                     }
                 });
-                label.appendChild(checkbox);
-                label.appendChild(document.createTextNode(' ' + currentLayerDescription));
-                layerSwitcherDiv.appendChild(label);
-            })(layerObject, layerDescription);
+            });
+
+            watch(layers, (newLayers) => {
+                newLayers.forEach((layer) => {
+                    const leafletLayer = wmsLayerObjects[layer.id];
+                    if (!leafletLayer) return;
+
+                    if (layer.visible && !mapInstance.hasLayer(leafletLayer)) {
+                        leafletLayer.addTo(mapInstance);
+                    } else if (!layer.visible && mapInstance.hasLayer(leafletLayer)) {
+                        mapInstance.removeLayer(leafletLayer);
+                    }
+
+                    const zIndex = newLayers.length - newLayers.indexOf(layer);
+                    if (leafletLayer.setZIndex) {
+                        leafletLayer.setZIndex(zIndex);
+                    }
+                });
+            }, { deep: true });
+
+            return { isSidebarCollapsed, layers, searchQuery, filteredLayers, visibleLayers, toggleSidebar };
         }
-    }
-    populateLayerSwitcher();
-
-
-    // 6. Legenda (Dinâmica) - Populando o div correto
-    var legendDiv = document.getElementById('legend'); // Target correto
-
-    function getLegendUrl(layerName) {
-        return urlGeoserver + "/mapas/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=mapas:" + layerName;
-    }
-
-     function populateLegend() {
-        // Limpa apenas o conteúdo anterior das legendas, MANTÉM o H3
-        $(legendDiv).find('div').remove(); // Remove divs de legenda anteriores
-
-        for (var layerName in wmsLayers) {
-            var layerData = wmsLayers[layerName];
-            var layerDescription = layerData.description;
-            var legendUrl = getLegendUrl(layerName);
-
-            var img = document.createElement('img');
-            img.src = legendUrl;
-            img.alt = "Legenda para " + layerDescription;
-
-            var layerLegendDiv = document.createElement('div');
-            layerLegendDiv.innerHTML = "<strong>" + layerDescription + ":</strong>"; // Removido <br>
-            layerLegendDiv.appendChild(img);
-            legendDiv.appendChild(layerLegendDiv);
-        }
-    }
-    populateLegend();
-
-
-    // 7. Barra de Busca (REMOVIDA)
-    // Código do L.Control.geocoder removido
-    // Código dos listeners para #search-button e #search-input removido
-
-
-    // 8. Geolocalização (MANTIDO)
-    map.locate({setView: true, maxZoom: 16});
-
-    function onLocationFound(e) {
-        var radius = e.accuracy / 2;
-        L.marker(e.latlng).addTo(map)
-            .bindPopup("Você está aqui com aproximadamente " + radius.toFixed(0) + " metros de precisão.").openPopup();
-        L.circle(e.latlng, radius).addTo(map);
-    }
-
-    function onLocationError(e) {
-        console.warn("Erro de geolocalização: " + e.message);
-    }
-
-    map.on('locationfound', onLocationFound);
-    map.on('locationerror', onLocationError);
-
-    // 9. Update Position (mantido, mas comentado)
-    // var marker = L.marker([-23.5505, -46.6333]).addTo(map);
-    // function updatePosition() {
-    //     $.ajax({
-    //         url: "/update-position",
-    //         success: function (data) {
-    //             var lat = data.latitude;
-    //             var lon = data.longitude;
-    //             marker.setLatLng([lat, lon]);
-    //             map.panTo([lat, lon]);
-    //         }
-    //     });
-    // }
-    // setInterval(updatePosition, 5000);
-
-
-    // --- AJUSTADO: Controles Retráteis ---
-    $(document).ready(function() {
-        // Função para alternar ícone (genérica)
-        function toggleIcon(buttonElement) {
-            var icon = $(buttonElement).find('.toggle-icon');
-            icon.toggleClass('fa-caret-down fa-caret-up'); // Alterna as classes
-        }
-
-        // Toggle para o Layer Switcher (dentro do contêiner combinado)
-        $("#layer-switcher-toggle").click(function() {
-            // Faz slide APENAS da lista de camadas (#layer-switcher)
-            $("#layer-switcher").slideToggle("slow");
-            toggleIcon(this); // 'this' refere-se ao #layer-switcher-toggle clicado
-        });
-
-        // Toggle para a Legenda (continua funcionando independentemente)
-        $("#legend-toggle").click(function() {
-            $("#legend").slideToggle("slow");
-            toggleIcon(this); // 'this' refere-se ao #legend-toggle clicado
-        });
-
-
-    });
+    }).mount('#app');
 </script>
+
 </body>
 </html>

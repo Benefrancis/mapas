@@ -34,7 +34,7 @@ services:
       - ./src/main/resources/templates:/templates
       - ./src/main/resources/static:/static
       - ./mpf-logs/${POSTGRES_NAME:-mapas}:/data/logs/mapas
-      - ./mpf-assets/${POSTGRES_NAME:-mapas}${POSTGRES_NAME:-mapas}/assets:/assets
+      - ./mpf-assets/${POSTGRES_NAME:-mapas}/assets:/assets
     command: java -jar /app/mapas.jar # Comando para iniciar sua aplicação
     networks:
       - net4${POSTGRES_NAME:-mapas}
