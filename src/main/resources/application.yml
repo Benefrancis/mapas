@@ -32,6 +32,14 @@ spring:
   config:
     import: optional:file:.env[.properties]
 
+
+geoserver:
+  internal:
+    # CORREÇÃO: Usando o nome do contêiner definido no docker-compose
+    # O nome do serviço 'geoserver' deveria funcionar, mas usar o nome do contêiner é mais explícito.
+    url: http://geoserver4mapas:8080/geoserver
+
+
   # REDIS
   cache:
     type: redis

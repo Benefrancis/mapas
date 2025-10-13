@@ -28,7 +28,7 @@ EXT_IGNORE = {".zip", 'mvnw', 'mvnw.cmd', ".pdn", ".txt", ".rar", ".tar", ".gz",
 
 DIRS_IGNORE = {'.git', 'target', 'out', 'dist', 'build', 'mvnw', 'mvnw.cmd', 'nginx', 'deckfiles', 'documentacao',
                'node_modules', 'venv', '__pycache__', 'data', 'logs', 'q8-data', 'q8-logs', '.idea', '.vscode',
-               'deckfiles', 'documentacao', '.gitattributes', '.editorconfig', '.mvn', '.npm', 'mpf-db', 'mpf-grafana', 'mpf-logs', 'mpf-geo', 'mpf-assets', 'documentos'}
+               'deckfiles', 'documentacao', '.gitattributes', '.editorconfig', '.mvn', '.npm', 'mpf-db', 'mpf-grafana', 'mpf-logs',  'mpf-assets', 'documentos'}
 
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 

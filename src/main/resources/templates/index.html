@@ -1,4 +1,3 @@
-<!-- main/resources/templates/index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -6,392 +5,112 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visualizador de Mapas Geoespaciais</title>
 
-    <!-- Leaflet -->
+    <!-- Leaflet, Vue, SortableJS, Font Awesome, Google Fonts... -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
-    <!-- Vue.js 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-
-    <!-- SortableJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-    <!-- Google Fonts: Roboto -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --glass-background: rgba(245, 245, 247, 0.65); /* Fundo mais claro, "aurora" */
-            --glass-border: 1px solid rgba(255, 255, 255, 0.4);
-            --text-primary: #1a1a1a; /* Texto escuro para contraste */
-            --text-secondary: #555;
-            --accent-color: #007aff;
-            --sidebar-width: 380px;
-            --transition-speed: 0.4s;
-        }
-
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: "Roboto", sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: #f0f0f0;
-        }
-
-        #app {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-        }
-
-        #map {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        .glass-panel {
-            background: var(--glass-background);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: var(--glass-border);
-            transition: all var(--transition-speed) ease;
-        }
-
-        aside {
-            position: absolute;
-            top: 20px; /* Espaçamento do topo */
-            left: 20px;
-            bottom: 20px;
-            width: var(--sidebar-width);
-            z-index: 1000;
-            border-radius: 16px;
-            display: flex;
-            flex-direction: column;
-            padding: 24px;
-            transform: translateX(0);
-        }
-
-        aside.collapsed {
-            transform: translateX(calc(-1 * var(--sidebar-width) - 20px));
-        }
-
-        .sidebar-toggle {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            left: calc(100% + 10px);
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 1.1em;
-            color: var(--text-primary);
-            border-radius: 50%;
-            border: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .sidebar-toggle i {
-            transition: transform var(--transition-speed) ease;
-        }
-
-        aside.collapsed .sidebar-toggle i {
-            transform: rotate(180deg);
-        }
-
-        .sidebar-header h2 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 1.6em;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        /* --- Caixa de Busca --- */
-        .search-box {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 12px 15px 12px 40px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 10px;
-            background: rgba(255,255,255,0.5);
-            font-family: "Roboto", sans-serif;
-            font-size: 1em;
-            font-weight: 300;
-            transition: all 0.2s ease;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
-        }
-
-        /* --- Lista de Camadas --- */
-        #layer-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            flex-grow: 1;
-            overflow-y: auto;
-            /* Estilo da scrollbar */
-            scrollbar-width: thin;
-            scrollbar-color: rgba(0,0,0,0.2) transparent;
-        }
-
-        #layer-list::-webkit-scrollbar { width: 6px; }
-        #layer-list::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.2); border-radius: 3px; }
-
-        #layer-list li {
-            display: flex;
-            align-items: center;
-            padding: 10px 5px;
-            margin-bottom: 4px;
-            border-radius: 8px;
-            cursor: grab;
-            transition: background 0.2s ease;
-            font-weight: 300;
-        }
-
-        #layer-list li:hover {
-            background: rgba(255, 255, 255, 0.4);
-        }
-
-        .sortable-ghost { opacity: 0.5; background: #c8ebfb; }
-        .drag-handle { margin: 0 10px; color: var(--text-secondary); cursor: grab; }
-        .drag-handle:active { cursor: grabbing; }
-
-        /* --- Checkbox Customizado --- */
-        .layer-label {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-        }
-        .layer-label input[type="checkbox"] { display: none; }
-        .custom-checkbox {
-            width: 20px;
-            height: 20px;
-            border: 2px solid #aaa;
-            border-radius: 5px;
-            margin-right: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-        .custom-checkbox .fa-check {
-            font-size: 12px;
-            color: white;
-            opacity: 0;
-            transform: scale(0.5);
-            transition: all 0.2s ease-in-out;
-        }
-        .layer-label input:checked + .custom-checkbox {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
-        }
-        .layer-label input:checked + .custom-checkbox .fa-check {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        /* --- Legenda --- */
-        .legend-section {
-            margin-top: auto;
-            padding-top: 15px;
-            border-top: 1px solid rgba(0,0,0,0.1);
-            max-height: 220px;
-            display: flex;
-            flex-direction: column;
-        }
-        .legend-section h3 { margin: 0 0 10px 0; font-weight: 500; }
-        #legend-container {
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(0,0,0,0.2) transparent;
-        }
-        #legend-container::-webkit-scrollbar { width: 6px; }
-        #legend-container::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.2); border-radius: 3px; }
-        .legend-item { margin-bottom: 15px; }
-        .legend-item strong { display: block; margin-bottom: 5px; font-size: 0.9em; font-weight: 400; color: var(--text-secondary); }
-        .legend-item img { max-width: 100%; border-radius: 4px; }
+        :root{--glass-background:rgba(245,245,247,.65);--glass-border:1px solid rgba(255,255,255,.4);--text-primary:#1a1a1a;--text-secondary:#555;--accent-color:#007aff;--sidebar-width:380px;--transition-speed:.4s}*,:after,:before{box-sizing:border-box}body{font-family:Roboto,sans-serif;margin:0;padding:0;overflow:hidden;background-color:#f0f0f0}#app{position:relative;width:100vw;height:100vh}#map{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1}.glass-panel{background:var(--glass-background);box-shadow:0 8px 32px 0 rgba(31,38,135,.15);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:var(--glass-border);transition:all var(--transition-speed) ease}aside{position:absolute;top:20px;left:20px;bottom:20px;width:var(--sidebar-width);z-index:1000;border-radius:16px;display:flex;flex-direction:column;padding:24px;transform:translateX(0)}aside.collapsed{transform:translateX(calc(-1 * var(--sidebar-width) - 20px))}.sidebar-toggle{position:absolute;top:50%;transform:translateY(-50%);left:calc(100% + 10px);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1em;color:var(--text-primary);border-radius:50%;border:none;box-shadow:0 4px 15px rgba(0,0,0,.1)}.sidebar-toggle i{transition:transform var(--transition-speed) ease}aside.collapsed .sidebar-toggle i{transform:rotate(180deg)}.sidebar-header h2{margin-top:0;margin-bottom:20px;font-size:1.6em;font-weight:500;color:var(--text-primary)}.search-box{position:relative;margin-bottom:20px}.search-box i{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--text-secondary)}.search-box input{width:100%;padding:12px 15px 12px 40px;border:1px solid rgba(0,0,0,.1);border-radius:10px;background:rgba(255,255,255,.5);font-family:Roboto,sans-serif;font-size:1em;font-weight:300;transition:all .2s ease}.search-box input:focus{outline:0;border-color:var(--accent-color);box-shadow:0 0 0 3px rgba(0,122,255,.2)}#layer-list{list-style:none;padding:0;margin:0;flex-grow:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.2) transparent}#layer-list::-webkit-scrollbar{width:6px}#layer-list::-webkit-scrollbar-thumb{background-color:rgba(0,0,0,.2);border-radius:3px}#layer-list li{display:flex;align-items:center;padding:10px 5px;margin-bottom:4px;border-radius:8px;cursor:grab;transition:background .2s ease;font-weight:300}#layer-list li:hover{background:rgba(255,255,255,.4)}.sortable-ghost{opacity:.5;background:#c8ebfb}.drag-handle{margin:0 10px;color:var(--text-secondary);cursor:grab}.drag-handle:active{cursor:grabbing}.layer-label{flex-grow:1;display:flex;align-items:center;cursor:pointer}.layer-label input[type=checkbox]{display:none}.custom-checkbox{width:20px;height:20px;border:2px solid #aaa;border-radius:5px;margin-right:12px;display:flex;align-items:center;justify-content:center;transition:all .2s ease}.custom-checkbox .fa-check{font-size:12px;color:#fff;opacity:0;transform:scale(.5);transition:all .2s ease-in-out}.layer-label input:checked+.custom-checkbox{background-color:var(--accent-color);border-color:var(--accent-color)}.layer-label input:checked+.custom-checkbox .fa-check{opacity:1;transform:scale(1)}.legend-section{margin-top:auto;padding-top:15px;border-top:1px solid rgba(0,0,0,.1);max-height:220px;display:flex;flex-direction:column}.legend-section h3{margin:0 0 10px;font-weight:500}#legend-container{overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.2) transparent}#legend-container::-webkit-scrollbar{width:6px}#legend-container::-webkit-scrollbar-thumb{background-color:rgba(0,0,0,.2);border-radius:3px}.legend-item{margin-bottom:15px}.legend-item strong{display:block;margin-bottom:5px;font-size:.9em;font-weight:400;color:var(--text-secondary)}.legend-item img{max-width:100%;border-radius:4px}.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(30,30,30,.5);display:flex;align-items:center;justify-content:center;z-index:2000}.modal-content{width:90%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;padding:24px;border-radius:16px}.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid rgba(0,0,0,.1)}.modal-header h3{margin:0;font-size:1.5em;font-weight:500;color:var(--text-primary)}.modal-close-btn{background:0 0;border:none;font-size:1.8em;cursor:pointer;color:var(--text-secondary);transition:color .2s ease}.modal-close-btn:hover{color:var(--text-primary)}.modal-body{overflow-y:auto;padding-right:10px;scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.2) transparent}.modal-body::-webkit-scrollbar{width:6px}.modal-body::-webkit-scrollbar-thumb{background-color:rgba(0,0,0,.2);border-radius:3px}.attribute-list{list-style:none;padding:0;margin:0}.attribute-list li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:.95em;word-break:break-all}.attribute-list li:last-child{border-bottom:none}.attribute-key{font-weight:500;color:var(--text-primary);padding-right:20px;text-transform:capitalize}.attribute-value{font-weight:300;color:var(--text-secondary);text-align:right}.loading-spinner{width:50px;height:50px;border:5px solid rgba(0,0,0,.1);border-top-color:var(--accent-color);border-radius:50%;animation:spin 1s linear infinite;margin:40px auto}@keyframes spin{to{transform:rotate(360deg)}}.fade-enter-active,.fade-leave-active{transition:opacity .3s ease}.fade-enter-from,.fade-leave-to{opacity:0}.fade-enter-active .modal-content,.fade-leave-active .modal-content{transition:all .3s ease}.fade-enter-from .modal-content,.fade-leave-to .modal-content{transform:scale(.95);opacity:0}
     </style>
 </head>
 <body>
-
 <div id="app" v-cloak>
     <aside :class="{ 'collapsed': isSidebarCollapsed }" class="glass-panel">
-        <button @click="toggleSidebar" class="sidebar-toggle glass-panel" aria-label="Alternar painel de camadas">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-
-        <div class="sidebar-header">
-            <h2>Camadas do Mapa</h2>
-        </div>
-
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" v-model="searchQuery" placeholder="Buscar camada...">
-        </div>
-
+        <button @click="toggleSidebar" class="sidebar-toggle glass-panel" aria-label="Alternar painel de camadas"><i class="fas fa-chevron-left"></i></button>
+        <div class="sidebar-header"><h2>Camadas do Mapa</h2></div>
+        <div class="search-box"><i class="fas fa-search"></i><input type="text" v-model="searchQuery" placeholder="Buscar camada..."></div>
         <ul id="layer-list">
-            <li v-for="layer in filteredLayers" :key="layer.id">
+            <li v-for="layer in filteredLayers" :key="layer.qualifiedName" :data-id="layer.qualifiedName">
                 <span class="drag-handle"><i class="fas fa-grip-vertical"></i></span>
-                <label class="layer-label">
-                    <input type="checkbox" v-model="layer.visible">
-                    <span class="custom-checkbox"><i class="fas fa-check"></i></span>
-                    {{ layer.description }}
-                </label>
+                <label class="layer-label"><input type="checkbox" v-model="layer.visible"><span class="custom-checkbox"><i class="fas fa-check"></i></span>{{ layer.description }}</label>
             </li>
         </ul>
-
         <div class="legend-section">
             <h3>Legenda</h3>
             <div id="legend-container">
-                <div v-for="layer in visibleLayers" :key="layer.id" class="legend-item">
-                    <strong>{{ layer.description }}</strong>
-                    <img :src="layer.legendUrl" :alt="'Legenda para ' + layer.description">
-                </div>
+                <div v-for="layer in visibleLayers" :key="layer.qualifiedName" class="legend-item"><strong>{{ layer.description }}</strong><img :src="layer.legendUrl" :alt="'Legenda para ' + layer.description"></div>
             </div>
         </div>
     </aside>
-
     <div id="map"></div>
+    <transition name="fade">
+        <div v-if="isModalVisible" class="modal-overlay" @click.self="closeModal">
+            <div class="modal-content glass-panel">
+                <div v-if="isLoading" class="loading-spinner"></div>
+                <template v-else>
+                    <div class="modal-header">
+                        <h3>Detalhes da Feição</h3><button @click="closeModal" class="modal-close-btn" aria-label="Fechar modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div v-if="filteredFeatureData && Object.keys(filteredFeatureData).length > 0">
+                            <ul class="attribute-list">
+                                <li v-for="(value, key) in filteredFeatureData" :key="key"><span class="attribute-key">{{ formatAttributeKey(key) }}</span><span class="attribute-value">{{ value }}</span></li>
+                            </ul>
+                        </div>
+                        <div v-else><p>Nenhuma informação encontrada neste local para as camadas ativas.</p></div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </transition>
 </div>
-
 <script>
     const { createApp, ref, onMounted, watch, computed } = Vue;
-
     createApp({
         setup() {
-            const geoserverPort = "8888";
-            const geoserverUrl = `http://localhost:${geoserverPort}/geoserver/`;
-            const workspace = "mapas";
-
-            const isSidebarCollapsed = ref(false);
-            const layers = ref([]);
-            const searchQuery = ref('');
-
-            let mapInstance = null;
-            let wmsLayerObjects = {};
-
-            const initialLayersData = [
-                { id: 'tb_aldeias_pontos', description: "Aldeias Indígenas (Pontos)" },
-                { id: 'tb_quilombolas', description: "Terra de Quilombos (Polígonos)" },
-                { id: 'tb_tis_amazonia_legal_poligonais', description: "TIs Amazônia Legal (Polígonos)" },
-                { id: 'tb_tis_pontos', description: "Territórios Indígenas (Pontos)" },
-                { id: 'tb_uf', description: "Unidades da Federação (Polígonos)" },
-                { id: 'tb_tis_poligonais', description: "Territórios Indígenas (Polígonos)" },
-                { id: 'ucs', description: "Unidades de Conservação (Polígonos)" }
-            ];
-
-            const toggleSidebar = () => {
-                isSidebarCollapsed.value = !isSidebarCollapsed.value;
-                setTimeout(() => mapInstance?.invalidateSize(), 400);
-            };
-
-            const createWMSLayer = (layerName) => L.tileLayer.wms(`${geoserverUrl}${workspace}/wms`, {
-                layers: `${workspace}:${layerName}`, format: 'image/png', transparent: true
+            const proxyBaseUrl = "/proxy/geoserver";
+            const isSidebarCollapsed = ref(!1), layers = ref([]), searchQuery = ref(""), isModalVisible = ref(!1), selectedFeatureData = ref(null), isLoading = ref(!1);
+            let mapInstance = null, wmsLayerObjects = {};
+            const initialLayersData = [{ workspace: "mapas", id: "tb_aldeias_pontos", description: "Aldeias Indígenas (Pontos)" }, { workspace: "mapas", id: "tb_quilombolas", description: "Terra de Quilombos (Polígonos)" }, { workspace: "mapas", id: "tb_tis_amazonia_legal_poligonais", description: "TIs Amazônia Legal (Polígonos)" }, { workspace: "mapas", id: "tb_tis_pontos", description: "Territórios Indígenas (Pontos)" }, { workspace: "mapas", id: "tb_uf", description: "Unidades da Federação (Polígonos)" }, { workspace: "mapas", id: "tb_tis_poligonais", description: "Territórios Indígenas (Polígonos)" }];
+            const createWMSLayer = e => L.tileLayer.wms(`${proxyBaseUrl}/${e.workspace}/wms`, { layers: e.qualifiedName, format: "image/png", transparent: !0 }), getLegendUrl = e => `${proxyBaseUrl}/${e.workspace}/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=${e.qualifiedName}`, closeModal = () => { isModalVisible.value = !1 }, formatAttributeKey = e => e.replace(/_/g, " ").replace(/\b\w/g, e => e.toUpperCase()), handleMapClick = async e => {
+                const t = visibleLayers.value;
+                if (0 === t.length) return;
+                isLoading.value = !0, isModalVisible.value = !0, selectedFeatureData.value = null;
+                const o = mapInstance.getSize(), a = mapInstance.getBounds(), n = t.reduce((e, t) => (e[t.workspace] || (e[t.workspace] = []), e[t.workspace].push(t.qualifiedName), e), {});
+                try {
+                    let t = [];
+                    for (const s in n) {
+                        const r = n[s].join(","), l = { service: "WMS", version: "1.1.1", request: "GetFeatureInfo", layers: r, query_layers: r, info_format: "application/json", feature_count: 10, x: Math.round(e.containerPoint.x), y: Math.round(e.containerPoint.y), srs: "EPSG:4326", width: o.x, height: o.y, bbox: a.toBBoxString() }, i = `${proxyBaseUrl}/${s}/wms?` + new URLSearchParams(l);
+                        console.log("Requisição para o Proxy:", i);
+                        const c = await fetch(i);
+                        if (!c.ok) throw new Error(`Erro no proxy para o workspace ${s}: ${c.statusText}`);
+                        const d = await c.json();
+                        console.log(`Resposta via Proxy de ${s}:`, d), d && d.features && d.features.length > 0 && (t = t.concat(d.features))
+                    }
+                    t.length > 0 ? selectedFeatureData.value = t[0].properties : selectedFeatureData.value = null
+                } catch (e) { console.error("Erro ao buscar informações via proxy:", e), selectedFeatureData.value = null } finally { isLoading.value = !1 }
+            }, filteredLayers = computed(() => searchQuery.value ? layers.value.filter(e => e.description.toLowerCase().includes(searchQuery.value.toLowerCase())) : layers.value), visibleLayers = computed(() => layers.value.filter(e => e.visible)), filteredFeatureData = computed(() => {
+                if (!selectedFeatureData.value) return null;
+                const e = {}, t = ["geom", "fid", "bbox"];
+                for (const o in selectedFeatureData.value) t.includes(o.toLowerCase()) || null === selectedFeatureData.value[o] || (e[o] = selectedFeatureData.value[o]);
+                return e
             });
-
-            const getLegendUrl = (layerName) => `${geoserverUrl}${workspace}/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=${workspace}:${layerName}`;
-
-            const filteredLayers = computed(() => {
-                if (!searchQuery.value) {
-                    return layers.value;
-                }
-                return layers.value.filter(layer =>
-                    layer.description.toLowerCase().includes(searchQuery.value.toLowerCase())
-                );
-            });
-
-            const visibleLayers = computed(() => layers.value.filter(layer => layer.visible));
-
-            onMounted(() => {
-                mapInstance = L.map('map').setView([-14.2350, -51.9253], 5);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                }).addTo(mapInstance);
-                L.control.scale({ imperial: false }).addTo(mapInstance);
-
-                layers.value = initialLayersData.map(layerInfo => {
-                    wmsLayerObjects[layerInfo.id] = createWMSLayer(layerInfo.id);
-                    return { ...layerInfo, visible: false, legendUrl: getLegendUrl(layerInfo.id) };
+            return onMounted(() => {
+                mapInstance = L.map("map").setView([-14.235, -51.9253], 5), L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>' }).addTo(mapInstance), L.control.scale({ imperial: !1 }).addTo(mapInstance), layers.value = initialLayersData.map(e => {
+                    const t = `${e.workspace}:${e.id}`, o = { ...e, qualifiedName: t, visible: !1 };
+                    return o.legendUrl = getLegendUrl(o), wmsLayerObjects[t] = createWMSLayer(o), o
                 }).reverse();
-
-                const el = document.getElementById('layer-list');
-                new Sortable(el, {
-                    handle: '.drag-handle',
-                    animation: 150,
-                    ghostClass: 'sortable-ghost',
-                    onEnd: (evt) => {
-                        const movedItem = layers.value.find(l => l.id === evt.item.dataset.id);
-                        if (!movedItem) return;
-
-                        const newLayersOrder = Array.from(el.children).map(li => {
-                            return layers.value.find(l => l.id === li.dataset.id);
-                        });
-
-                        // O SortableJS já reordenou o DOM. Precisamos reordenar o array `layers`
-                        // de acordo com o `filteredLayers` atualizado, mas aplicando a todos os itens.
-                        // Esta é uma lógica complexa quando há filtro. A forma mais robusta é reordenar o array principal.
-                        const itemToMove = layers.value.splice(evt.oldDraggableIndex, 1)[0];
-                        layers.value.splice(evt.newDraggableIndex, 0, itemToMove);
+                const e = document.getElementById("layer-list");
+                new Sortable(e, {
+                    handle: ".drag-handle", animation: 150, ghostClass: "sortable-ghost", onEnd: e => {
+                        const t = layers.value.splice(e.oldDraggableIndex, 1)[0];
+                        layers.value.splice(e.newDraggableIndex, 0, t)
                     }
-                });
-            });
-
-            watch(layers, (newLayers) => {
-                newLayers.forEach((layer) => {
-                    const leafletLayer = wmsLayerObjects[layer.id];
-                    if (!leafletLayer) return;
-
-                    if (layer.visible && !mapInstance.hasLayer(leafletLayer)) {
-                        leafletLayer.addTo(mapInstance);
-                    } else if (!layer.visible && mapInstance.hasLayer(leafletLayer)) {
-                        mapInstance.removeLayer(leafletLayer);
-                    }
-
-                    const zIndex = newLayers.length - newLayers.indexOf(layer);
-                    if (leafletLayer.setZIndex) {
-                        leafletLayer.setZIndex(zIndex);
-                    }
-                });
-            }, { deep: true });
-
-            return { isSidebarCollapsed, layers, searchQuery, filteredLayers, visibleLayers, toggleSidebar };
+                }), mapInstance.on("click", handleMapClick)
+            }), watch(layers, (e, t) => {
+                e.forEach((t, o) => {
+                    const a = wmsLayerObjects[t.qualifiedName];
+                    a && (t.visible && !mapInstance.hasLayer(a) ? a.addTo(mapInstance) : !t.visible && mapInstance.hasLayer(a) && mapInstance.removeLayer(a), o = e.length - o, a.setZIndex && a.setZIndex(o))
+                })
+            }, { deep: !0 }), { isSidebarCollapsed: isSidebarCollapsed, layers: layers, searchQuery: searchQuery, filteredLayers: filteredLayers, visibleLayers: visibleLayers, toggleSidebar: () => { isSidebarCollapsed.value = !isSidebarCollapsed.value, setTimeout(() => { null == mapInstance || mapInstance.invalidateSize() }, 400) }, isModalVisible: isModalVisible, isLoading: isLoading, closeModal: closeModal, filteredFeatureData: filteredFeatureData, formatAttributeKey: formatAttributeKey }
         }
-    }).mount('#app');
+    }).mount("#app");
 </script>
-
 </body>
 </html>
