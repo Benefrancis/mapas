@@ -65,7 +65,7 @@ services:
       GEOWEBCACHE_CACHE_DIR: /var/lib/geowebcache/cache
       NETCDF_DATA_DIR: /var/lib/netcdf
       GRIB_CACHE_DIR: /var/lib/grib
-      ALLOWED_ORIGINS: http://localhost,http://territoriostradicionais.mpf.mp.br,https://territoriostradicionais.mpf.mp.br,http://127.0.0.1:80, http://127.0.0.1, http://localhost, http://localhost:80  # Suas origens permitidas
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost}  # Suas origens permitidas
     volumes:
       - ./mpf-geo/${POSTGRES_NAME:-mapas}/geoserver:/var/log/geoserver
       - ./mpf-geo/${POSTGRES_NAME:-mapas}/geoserver/datadir:/var/lib/geoserver_data
