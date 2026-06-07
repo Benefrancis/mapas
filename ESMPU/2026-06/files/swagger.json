@@ -1,0 +1,849 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "SNCR-API",
+        "description": "API REST do SNCR",
+        "version": "1.1.0"
+    },
+    "servers": [
+        {
+            "url": "https://apigateway.conectagov.estaleiro.serpro.gov.br",
+            "description": "Servidor de Produção"
+        },
+        {
+        "url": "https://h-apigateway.conectagov.np.estaleiro.serpro.gov.br",
+        "description": "Servidor de Homologação"
+        }
+    ],
+    "security": [
+        {
+            "apiKeyScheme": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "1. Sncr Api Rest V2",
+            "description": "Api de serviços rest do SNCR na versão 2, mais recente"
+        }
+    ],
+    "paths": {
+        "/v2/verificarSituacaoImovel/{codigo}": {
+            "get": {
+                "tags": [
+                    "1. Sncr Api Rest V2"
+                ],
+                "summary": "Consulta a situação do imóvel por código.",
+                "operationId": "verificarSituacaoImovel",
+                "parameters": [
+                    {
+                        "name": "codigo",
+                        "in": "path",
+                        "description": "Código do imóvel sem formatação com 13 digitos",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": 9510990856428
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Situacao"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/consultarImovelPorCpfCnpj/{cpfCnpj}": {
+            "get": {
+                "tags": [
+                    "1. Sncr Api Rest V2"
+                ],
+                "summary": "Consulta lista de imóveis por CPF/CNPJ.",
+                "operationId": "consultarImovelPorCpfCnpj",
+                "parameters": [
+                    {
+                        "name": "cpfCnpj",
+                        "in": "path",
+                        "description": "Número do CPF do titular ou cônjuge de um dos titulares do imóvel ou CNPJ do titular do imóvel",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": 59346402083
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Imovel"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/consultarImovelPorCodigo/{codigo}": {
+            "get": {
+                "tags": [
+                    "1. Sncr Api Rest V2"
+                ],
+                "summary": "Consulta dos dados de um imóvel por código.",
+                "operationId": "consultarImovelPorCodigo",
+                "parameters": [
+                    {
+                        "name": "codigo",
+                        "in": "path",
+                        "description": "Código do imóvel sem formatação com 13 digitos",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": 9510990856428
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ImovelComCcir"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/baixarCcirPorCodigoImovel/{codigo}": {
+            "get": {
+                "tags": [
+                    "1. Sncr Api Rest V2"
+                ],
+                "summary": "Baixar CCIR de um imóvel por código do imóvel.",
+                "operationId": "baixarCcirPorCodigoImovel",
+                "parameters": [
+                    {
+                        "name": "codigo",
+                        "in": "path",
+                        "description": "Código do imóvel sem formatação com 13 digitos",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": 7090260272785
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Arquivo PDF gerado com sucesso",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "Imóvel não possui CCIR vigente para ser emitido."
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Situacao": {
+                "type": "object",
+                "properties": {
+                    "situacaoImovel": {
+                        "type": "string"
+                    },
+                    "motivoCancelamento": {
+                        "type": "string"
+                    },
+                    "dataCancelamento": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Imovel": {
+                "type": "object",
+                "properties": {
+                    "codigoImovel": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "nomeImovelRural": {
+                        "type": "string"
+                    },
+                    "localizacaoImovelRural": {
+                        "type": "string"
+                    },
+                    "situacaoImovel": {
+                        "type": "string"
+                    },
+                    "motivoCancelamento": {
+                        "type": "string"
+                    },
+                    "dataCancelamento": {
+                        "type": "string"
+                    },
+                    "areaTotal": {
+                        "type": "number"
+                    },
+                    "qtdAraeModulosFiscais": {
+                        "type": "number"
+                    },
+                    "inibicao": {
+                        "type": "string"
+                    },
+                    "dataInibicao": {
+                        "type": "string"
+                    },
+                    "titulares": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Titular"
+                        }
+                    },
+                    "temporarios": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Temporario"
+                        }
+                    },
+                    "localizacoes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Localizacao"
+                        }
+                    },
+                    "situacoesJuridicas": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SituacaoJuridica"
+                        }
+                    },
+                    "codigoCertificacaoSnci": {
+                        "type": "string"
+                    },
+                    "dataUltimaAtualizacaoCadastral": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Localizacao": {
+                "type": "object",
+                "properties": {
+                    "codigoIbge": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "municipio": {
+                        "type": "string"
+                    },
+                    "siglaUf": {
+                        "type": "string"
+                    },
+                    "areaMunicipio": {
+                        "type": "number"
+                    },
+                    "indicadorSede": {
+                        "type": "string",
+                        "format": "byte"
+                    }
+                }
+            },
+            "SituacaoJuridica": {
+                "type": "object",
+                "properties": {
+                    "situacaoJuridica": {
+                        "type": "string"
+                    },
+                    "formaObtencao": {
+                        "type": "string"
+                    },
+                    "dataSituacaoJuridica": {
+                        "type": "string"
+                    },
+                    "areaSituacaoJuridica": {
+                        "type": "number"
+                    },
+                    "cartorioImovel": {
+                        "type": "string"
+                    },
+                    "codigoCns": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "matricula": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "numeroRegistroTranscricao": {
+                        "type": "string"
+                    },
+                    "codigoParcelaSigef": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Temporario": {
+                "type": "object",
+                "properties": {
+                    "cpfCnpj": {
+                        "type": "string"
+                    },
+                    "nomeTemporario": {
+                        "type": "string"
+                    },
+                    "paisOrigem": {
+                        "type": "string"
+                    },
+                    "estadoCivilTemporario": {
+                        "type": "string"
+                    },
+                    "regimeBens": {
+                        "type": "string"
+                    },
+                    "condicaoPessoa": {
+                        "type": "string"
+                    },
+                    "atividadeExploracao": {
+                        "type": "string"
+                    },
+                    "capitalNacional": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "capitalEstrangeiro": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "qtdAreaCedida": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "tipoContrato": {
+                        "type": "string"
+                    },
+                    "prazoContrato": {
+                        "type": "string"
+                    },
+                    "dataTerminoContrato": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Titular": {
+                "type": "object",
+                "properties": {
+                    "cpfCnpj": {
+                        "type": "string"
+                    },
+                    "nomeTitular": {
+                        "type": "string"
+                    },
+                    "declarante": {
+                        "type": "string",
+                        "format": "byte"
+                    },
+                    "estadoCivilTitular": {
+                        "type": "string"
+                    },
+                    "cpfConjuge": {
+                        "type": "string"
+                    },
+                    "nomeConjuge": {
+                        "type": "string"
+                    }
+                }
+            },
+            "AreaRegistradaCcir_ImovelComCcir": {
+                "type": "object",
+                "properties": {
+                    "ufCartorio": {
+                        "type": "string"
+                    },
+                    "municipioCartorio": {
+                        "type": "string"
+                    },
+                    "dataRegistro": {
+                        "type": "string"
+                    },
+                    "cnsOuOficio": {
+                        "type": "string"
+                    },
+                    "matriculaOuTranscricao": {
+                        "type": "string"
+                    },
+                    "registro": {
+                        "type": "string"
+                    },
+                    "livroOuFicha": {
+                        "type": "string"
+                    },
+                    "area": {
+                        "type": "number"
+                    }
+                }
+            },
+            "DadosCcirExterno_ImovelComCcir": {
+                "type": "object",
+                "properties": {
+                    "codigoImovelIncra": {
+                        "type": "string"
+                    },
+                    "denominacao": {
+                        "type": "string"
+                    },
+                    "areaTotal": {
+                        "type": "number"
+                    },
+                    "classificacaoFundiaria": {
+                        "type": "string"
+                    },
+                    "dataProcessamentoUltimaDeclaracao": {
+                        "type": "string"
+                    },
+                    "areaCertificada": {
+                        "type": "number"
+                    },
+                    "indicacoesLocalizacao": {
+                        "type": "string"
+                    },
+                    "municipioSede": {
+                        "type": "string"
+                    },
+                    "ufSede": {
+                        "type": "string"
+                    },
+                    "areaModuloRural": {
+                        "type": "number"
+                    },
+                    "numeroModulosRurais": {
+                        "type": "number"
+                    },
+                    "areaModuloFiscal": {
+                        "type": "number"
+                    },
+                    "numeroModulosFiscais": {
+                        "type": "number"
+                    },
+                    "fracaoMinimaParcelamento": {
+                        "type": "number"
+                    },
+                    "areasRegistradas": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AreaRegistradaCcir_ImovelComCcir"
+                        }
+                    },
+                    "totalAreaRegistrada": {
+                        "type": "number"
+                    },
+                    "totalAreaPosseJustoTitulo": {
+                        "type": "number"
+                    },
+                    "totalAreaPosseSimplesOcupacao": {
+                        "type": "number"
+                    },
+                    "areaMedida": {
+                        "type": "number"
+                    },
+                    "totalPessoasRelacionadasImovel": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "titulares": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TitularCcirExterno_ImovelComCcir"
+                        }
+                    },
+                    "dadosUltimoCcir": {
+                        "$ref": "#/components/schemas/DadosControleCcir_ImovelComCcir"
+                    }
+                },
+                "description": "Modelo de resposta com os dados do CCIR"
+            },
+            "DadosControleCcir_ImovelComCcir": {
+                "type": "object",
+                "properties": {
+                    "dataLancamento": {
+                        "type": "string"
+                    },
+                    "numeroCcir": {
+                        "type": "string"
+                    },
+                    "numeroAutenticidadeCcir": {
+                        "type": "string"
+                    },
+                    "dataGeracaoCcir": {
+                        "type": "string"
+                    },
+                    "dataVencimentoCcir": {
+                        "type": "string"
+                    },
+                    "debitosAnteriores": {
+                        "type": "number"
+                    },
+                    "taxaServicosCadastrais": {
+                        "type": "number"
+                    },
+                    "valorCobrado": {
+                        "type": "number"
+                    },
+                    "multa": {
+                        "type": "number"
+                    },
+                    "juros": {
+                        "type": "number"
+                    },
+                    "valorTotal": {
+                        "type": "number"
+                    },
+                    "situacaoCcir": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ImovelComCcir": {
+                "type": "object",
+                "properties": {
+                    "codigoImovel": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "nomeImovelRural": {
+                        "type": "string"
+                    },
+                    "localizacaoImovelRural": {
+                        "type": "string"
+                    },
+                    "situacaoImovel": {
+                        "type": "string"
+                    },
+                    "motivoCancelamento": {
+                        "type": "string"
+                    },
+                    "dataCancelamento": {
+                        "type": "string"
+                    },
+                    "areaTotal": {
+                        "type": "number"
+                    },
+                    "qtdAraeModulosFiscais": {
+                        "type": "number"
+                    },
+                    "inibicao": {
+                        "type": "string"
+                    },
+                    "dataInibicao": {
+                        "type": "string"
+                    },
+                    "titulares": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Titular_ImovelComCcir"
+                        }
+                    },
+                    "temporarios": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Temporario_ImovelComCcir"
+                        }
+                    },
+                    "localizacoes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Localizacao_ImovelComCcir"
+                        }
+                    },
+                    "situacoesJuridicas": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SituacaoJuridica_ImovelComCcir"
+                        }
+                    },
+                    "ccir": {
+                        "$ref": "#/components/schemas/DadosCcirExterno_ImovelComCcir"
+                    },
+                    "habilitadoEmitirCcir": {
+                        "type": "boolean"
+                    },
+                    "codigoCertificacaoSnci": {
+                        "type": "string"
+                    },
+                    "dataUltimaAtualizacaoCadastral": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Localizacao_ImovelComCcir": {
+                "type": "object",
+                "properties": {
+                    "codigoIbge": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "municipio": {
+                        "type": "string"
+                    },
+                    "siglaUf": {
+                        "type": "string"
+                    },
+                    "areaMunicipio": {
+                        "type": "number"
+                    },
+                    "indicadorSede": {
+                        "type": "string",
+                        "format": "byte"
+                    }
+                }
+            },
+            "SituacaoJuridica_ImovelComCcir": {
+                "type": "object",
+                "properties": {
+                    "situacaoJuridica": {
+                        "type": "string"
+                    },
+                    "formaObtencao": {
+                        "type": "string"
+                    },
+                    "dataSituacaoJuridica": {
+                        "type": "string"
+                    },
+                    "areaSituacaoJuridica": {
+                        "type": "number"
+                    },
+                    "cartorioImovel": {
+                        "type": "string"
+                    },
+                    "codigoCns": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "matricula": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "numeroRegistroTranscricao": {
+                        "type": "string"
+                    },
+                    "codigoParcelaSigef": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Temporario_ImovelComCcir": {
+                "type": "object",
+                "properties": {
+                    "cpfCnpj": {
+                        "type": "string"
+                    },
+                    "nomeTemporario": {
+                        "type": "string"
+                    },
+                    "paisOrigem": {
+                        "type": "string"
+                    },
+                    "estadoCivilTemporario": {
+                        "type": "string"
+                    },
+                    "regimeBens": {
+                        "type": "string"
+                    },
+                    "condicaoPessoa": {
+                        "type": "string"
+                    },
+                    "atividadeExploracao": {
+                        "type": "string"
+                    },
+                    "capitalNacional": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "capitalEstrangeiro": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "qtdAreaCedida": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "tipoContrato": {
+                        "type": "string"
+                    },
+                    "prazoContrato": {
+                        "type": "string"
+                    },
+                    "dataTerminoContrato": {
+                        "type": "string"
+                    }
+                }
+            },
+            "TitularCcirExterno_ImovelComCcir": {
+                "type": "object",
+                "properties": {
+                    "cpfCnpj": {
+                        "type": "string"
+                    },
+                    "nomeTitular": {
+                        "type": "string"
+                    },
+                    "declarante": {
+                        "type": "string"
+                    },
+                    "condicaoTitularidade": {
+                        "type": "string"
+                    },
+                    "percentualDetencao": {
+                        "type": "number"
+                    },
+                    "nacionalidade": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Titular_ImovelComCcir": {
+                "type": "object",
+                "properties": {
+                    "cpfCnpj": {
+                        "type": "string"
+                    },
+                    "nomeTitular": {
+                        "type": "string"
+                    },
+                    "declarante": {
+                        "type": "string",
+                        "format": "byte"
+                    },
+                    "estadoCivilTitular": {
+                        "type": "string"
+                    },
+                    "cpfConjuge": {
+                        "type": "string"
+                    },
+                    "nomeConjuge": {
+                        "type": "string"
+                    }
+                }
+            },
+            "AreaComposicaoImovel": {
+                "type": "object",
+                "properties": {
+                    "codigoImovel": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "denominacaoImovel": {
+                        "type": "string"
+                    },
+                    "dataAquisicaoImovel": {
+                        "type": "string"
+                    },
+                    "areasAdquiridas": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OperacaoAreaImovel"
+                        }
+                    },
+                    "areasCedidas": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OperacaoAreaImovel"
+                        }
+                    },
+                    "areasDesmembradas": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OperacaoAreaImovel"
+                        }
+                    }
+                }
+            },
+            "OperacaoAreaImovel": {
+                "type": "object",
+                "properties": {
+                    "codigoImovel": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "denominacaoImovel": {
+                        "type": "string"
+                    },
+                    "tipoOperacao": {
+                        "type": "string"
+                    },
+                    "area": {
+                        "type": "number"
+                    },
+                    "data": {
+                        "type": "string"
+                    },
+                    "titulares": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TitularOperacaoArea"
+                        }
+                    }
+                }
+            },
+            "TitularOperacaoArea": {
+                "type": "object",
+                "properties": {
+                    "cpfCnpj": {
+                        "type": "string"
+                    },
+                    "nomeTitular": {
+                        "type": "string"
+                    },
+                    "declarante": {
+                        "type": "string",
+                        "format": "byte"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+             "OAuth2Authorization": {
+                "type": "oauth2",
+                "flows": {
+                "implicit": {
+                    "authorizationUrl": "https://apigateway.conectagov.estaleiro.serpro.gov.br/oauth2/jwt-token",
+                    "scopes": {
+
+                    }
+                }
+                }
+            },
+            "OAuth2AuthorizationHom": {
+                "type": "oauth2",
+                "flows": {
+                "clientCredentials": {
+                    "tokenUrl": "https://h-apigateway.conectagov.np.estaleiro.serpro.gov.br/oauth2/jwt-token",
+                    "scopes": {}
+                }
+                }
+            }
+        }
+    }
+}

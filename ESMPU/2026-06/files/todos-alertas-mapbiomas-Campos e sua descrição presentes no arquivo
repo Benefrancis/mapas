@@ -1,0 +1,118 @@
+after_dt
+Data da imagem depois da detecção do alerta
+alert_code
+Código do Alerta
+alert_geometry_id
+area_ha
+Área do alerta em hectares
+before_dt
+Sata da imagem antes da detecção do alerta
+biome
+Biomas onde se encontra o aleta. Se esta na fronteira preserva o que tiver área maior.
+biome_area
+Área de cruzamento do alerta com o Bioma
+biome_id
+car_area_max
+Área máxima cruzada com cars
+car_area_min
+Área mínima cruzada com cars
+car_area_sum
+Soma das áreas de cars cruzados com o alerta
+car_area_sum_adj
+car_count
+Total de CARs cruzados com o alerta
+city
+Município onde se encontra o alerta. Se esta na fronteira preserva o que tiver área maior (nome)
+city_area
+Área de cruzamento do alerta com Municipio
+city_id
+conservation_unit
+Nome da Unidade de Conservação
+conservation_unit_area
+Área de cruzamento do alerta com a unidade de conservação
+conservation_unit_id
+days_interval
+def_asv
+Cruzamento com autorização de Supressão da Vegetação para o imovel no SINAFLOR
+def_asv_area
+Área total de Autorizações de Supressão da Vegetação para o imovel no SINAFLOR
+def_efp
+def_efp_area
+def_pmfs
+Cruzamento com com Plano de Manejo Florestal Sustentatável (PMFS)
+def_pmfs_area
+Área total de cruzamento com PMFS
+def_poa
+def_poa_area
+def_uas
+def_uas_area
+detected_at
+Data da deteção do alerta
+detected_year
+Ano de detecção do alerta pela fonte
+embargoed_properties_area_max
+Área máxima de cruzamento do alerta com embargada
+embargoed_properties_area_min
+Área mínima de cruzamento do alerta com embargada
+embargoed_properties_area_sum
+Soma das áreas embargadas
+embargoed_properties_count
+Total de cruzamentos com áreas embargadas
+embargoed_properties_count_area
+Soma das áreas de propriedades embargadas cruzadas com o alerta
+id
+indigenous_land
+Nome da Terra Indigena
+indigenous_land_area
+Área de cruzamento do alerta com a Terra indígena
+indigenous_land_id
+legal_reserve_area_max
+Área máxima cruzada com RL
+legal_reserve_area_min
+Área mínima cruzada com RL
+legal_reserve_area_sum
+Soma das áreas de RL cruzadas com o alerta
+legal_reserve_area_sum_adj
+legal_reserve_count
+Total de cruzamentos com áreas de Reserva Legal (RL)
+ppa_area_max
+Área máxima cruzada com APP
+ppa_area_min
+Área mínima cruzada com APP
+ppa_area_sum
+Soma das áreas de APP cruzadas com o alerta
+ppa_area_sum_adj
+ppa_count
+Total de cruzamento com áreas de preservação permanente (APP)
+quilombo
+Nome do territorio quilombola
+quilombo_area
+Área de cruzamento do alerta com Territorio Quilombola
+quilombo_id
+river_source_count
+Total de cruzamentos com nascentes de rios
+settlement
+Nome do assentamento
+settlement_area
+Área de cruzamento do alerta com Assentamento
+settlement_id
+source
+Fonte original do alerta a patir do qual foi validado e refinado
+state
+Estado onde se encontra o aleta. Se esta na fronteira preserva o que tiver área maior (nome)
+state_area
+Área de cruzamento do alerta com Estado
+state_id
+status
+Status do Alerta
+status_desc
+watershed_l1
+Bacia hidrográfica nível 1
+watershed_l1_area
+Área de cruzamento com a bacia hidrográfica nível 1
+watershed_l1_id
+watershed_l2
+Bacia hidrográfica nível 2
+watershed_l2_area
+Área de cruzamento com a bacia hidrográfica nível 2
+watershed_l2_id

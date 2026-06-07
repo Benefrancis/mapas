@@ -1,229 +1,407 @@
 import os
-import re
 import sys
+from pathlib import Path
 
-# Extensões conhecidas para linguagens
-EXT_LINGUAGEM_PADRAO = {
-    ".java": ("java", "//"),
-    ".xml": ("xml", "block"),
-    ".html": ("html", "block"),
-    ".htm": ("html", "block"),
-    ".yml": ("yaml", "#"),
-    ".yaml": ("yaml", "#"),
-    ".properties": ("properties", "#"),
-    ".sql": ("sql", "--"),
-    ".ts": ("typescript", "//"),
-    ".js": ("javascript", "//"),
-    ".vue": ("vue", "<!-- -->"),
-    ".py": ("python", "#"),
-    ".css": ("css", "/* */"),
-    ".scss": ("scss", "/* */"),
-    ".json": ("json", "//"),
+# =========================================================
+# CONFIGURAÇÕES
+# =========================================================
+
+NOME_DOCUMENTACAO = "DOCUMENTACAO.md"
+NOME_EXTENSOES = "extensoes_encontradas.md"
+
+MAX_FILE_SIZE = 2 * 1024 * 1024  # 2MB
+
+# ---------------------------------------------------------
+# EXTENSÕES RELEVANTES PARA SOFTWARE
+# ---------------------------------------------------------
+
+EXTENSOES_PERMITIDAS = {
+    ".java",
+    ".kt",
+    ".groovy",
+    ".py",
+    ".js",
+    ".jsx",
+    ".ts",
+    ".tsx",
+    ".vue",
+    ".sql",
+    ".json",
+    ".yaml",
+    ".yml",
+    ".xml",
+    ".properties",
+    ".conf",
+    ".env",
+    ".ini",
+    ".sh",
+    ".ps1",
+    ".txt",
+    ".css",
+    ".scss",
+    ".html",
+    ".gradle",
+    ".kts",
+    ".tf",
+    ".toml",
+    ".bat",
+    ".c",
+    ".cpp",
+    ".h",
+    ".hpp",
+    ".cs",
+    ".go",
+    ".rs",
+    ".php",
+    ".rb",
+    ".swift",
 }
 
-# Extensões a ignorar (binários, imagens, grandes)
-EXT_IGNORE = {".zip", 'mvnw', 'mvnw.cmd', ".pdn", ".txt", ".rar", ".tar", ".gz", ".7z", ".jar", ".class", ".exe",
-              ".dll", ".png", ".jpg", ".jpeg", ".gif", ".csv", ".ico", ".bmp", ".pdf", ".doc", ".docx", ".md", ".svg",
-              ".ico", ".webp"}
+# ---------------------------------------------------------
+# ARQUIVOS SEM EXTENSÃO PERMITIDOS
+# ---------------------------------------------------------
 
-DIRS_IGNORE = {'.git', 'target', 'out', 'dist', 'build', 'mvnw', 'mvnw.cmd', 'nginx', 'deckfiles', 'documentacao',
-               'node_modules', 'venv', '__pycache__', 'data', 'logs', 'q8-data', 'q8-logs', '.idea', '.vscode',
-               'deckfiles', 'documentacao', '.gitattributes', '.editorconfig', '.mvn', '.npm', 'mpf-db', 'mpf-grafana', 'mpf-logs',  'mpf-assets', 'documentos'}
+ARQUIVOS_SEM_EXTENSAO_PERMITIDOS = {
+    "Dockerfile",
+    "Jenkinsfile",
+    "Makefile",
+}
 
-MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+# ---------------------------------------------------------
+# ARQUIVOS ESPECÍFICOS A IGNORAR
+# ---------------------------------------------------------
 
-NOME_ARQUIVO_MD = "DOCUMENTACAO.md"
-NOME_ARQUIVO_MD_CENTRAL = "DOCUMENTACAO_TODOS_MICROSSERVICOS.md"
+ARQUIVOS_IGNORE = {
+    "package-lock.json",
+    "yarn.lock",
+    "pnpm-lock.yaml",
+    ".DS_Store",
+}
+
+# ---------------------------------------------------------
+# DIRETÓRIOS IGNORADOS
+# ---------------------------------------------------------
+
+DIRS_IGNORE = {
+    "SUSEP",
+    ".git",
+    "node_modules",
+    "target",
+    "build",
+    "dist",
+    "out",
+    ".idea",
+    ".vscode",
+    "__pycache__",
+    "venv",
+    ".mvn",
+    ".gradle",
+    "coverage",
+    "logs",
+    "tmp",
+    "q8-data",
+    "q8-files",
+    "q8-logs",
+    "docs",
+    "documentacao",
+    ".github"
+}
+
+# ---------------------------------------------------------
+# MAPA DE LINGUAGEM
+# ---------------------------------------------------------
+
+MAPA_LINGUAGEM = {
+    ".java": "java",
+    ".kt": "kotlin",
+    ".groovy": "groovy",
+    ".py": "python",
+    ".js": "javascript",
+    ".jsx": "javascript",
+    ".ts": "typescript",
+    ".tsx": "typescript",
+    ".vue": "vue",
+    ".sql": "sql",
+    ".json": "json",
+    ".yaml": "yaml",
+    ".yml": "yaml",
+    ".xml": "xml",
+    ".properties": "properties",
+    ".conf": "conf",
+    ".env": "bash",
+    ".ini": "ini",
+    ".sh": "bash",
+    ".ps1": "powershell",
+    ".md": "markdown",
+    ".txt": "text",
+    ".css": "css",
+    ".scss": "scss",
+    ".html": "html",
+    ".gradle": "groovy",
+    ".kts": "kotlin",
+    ".tf": "terraform",
+    ".toml": "toml",
+    ".bat": "bat",
+    ".c": "c",
+    ".cpp": "cpp",
+    ".h": "c",
+    ".hpp": "cpp",
+    ".cs": "csharp",
+    ".go": "go",
+    ".rs": "rust",
+    ".php": "php",
+    ".rb": "ruby",
+    ".swift": "swift",
+}
 
 
-def slugify(text):
-    text = text.lower()
-    text = re.sub(r"[^\w\-\/]", "", text)
-    return text.replace(" ", "-").replace(os.sep, "-")
+# =========================================================
+# UTIL
+# =========================================================
+
+def obter_linguagem(extensao: str) -> str:
+    return MAPA_LINGUAGEM.get(extensao.lower(), "text")
 
 
-def inferir_linguagem(ext):
-    ext = ext.lower()
-    if ext in EXT_LINGUAGEM_PADRAO:
-        return EXT_LINGUAGEM_PADRAO[ext]
-    if ext.startswith(".ts"):
-        return ("typescript", "//")
-    if ext.startswith(".js"):
-        return ("javascript", "//")
-    if ext.startswith(".html"):
-        return ("html", "block")
-    if ext.startswith(".css"):
-        return ("css", "/* */")
-    if ext.startswith(".scss"):
-        return ("scss", "/* */")
-    if ext.startswith(".json"):
-        return ("json", "//")
-    if ext.startswith(".vue"):
-        return ("vue", "<!-- -->")
-    if ext.startswith(".py"):
-        return ("python", "#")
-    if ext.startswith(".sql"):
-        return ("sql", "--")
-    return (ext[1:] if ext else "text", "#")
+def arquivo_valido(path: Path) -> bool:
 
-
-def is_text_file(file_path):
-    ext = os.path.splitext(file_path)[1].lower()
-    if ext in EXT_IGNORE:
+    if not path.is_file():
         return False
-    if os.path.getsize(file_path) > MAX_FILE_SIZE:
-        print(f"Atenção: Ignorando arquivo grande {file_path}")
+
+    # ignora arquivos gerados pelo próprio script
+    if path.name in {NOME_DOCUMENTACAO, NOME_EXTENSOES}:
         return False
+
+    # ignora arquivos específicos
+    if path.name in ARQUIVOS_IGNORE:
+        return False
+
+    # ignora arquivos sem extensão não permitidos
+    if (
+            not path.suffix
+            and path.name not in ARQUIVOS_SEM_EXTENSAO_PERMITIDOS
+    ):
+        return False
+
+    # ignora extensões não permitidas
+    if (
+            path.suffix.lower() not in EXTENSOES_PERMITIDAS
+            and path.name not in ARQUIVOS_SEM_EXTENSAO_PERMITIDOS
+    ):
+        return False
+
+    # ignora arquivos minificados
+    if path.name.endswith(".min.js"):
+        return False
+
+    if path.name.endswith(".bundle.js"):
+        return False
+
+    # ignora arquivos muito grandes
+    try:
+        if path.stat().st_size > MAX_FILE_SIZE:
+            print(f"Ignorando arquivo grande: {path}")
+            return False
+    except Exception:
+        return False
+
     return True
 
 
-def gerar_documentacao_diretorio(projeto_dir, unico=False):
-    conteudo_unico = []
-    indice = []
-    md_por_diretorio = []
+# =========================================================
+# LEITURA RECURSIVA
+# =========================================================
 
-    for root, dirs, files in os.walk(projeto_dir):
-        # Remove diretórios ignorados do walk
+def listar_arquivos_recursivamente(diretorio: Path) -> list[Path]:
+
+    arquivos = []
+
+    for root, dirs, files in os.walk(diretorio):
+
         dirs[:] = [d for d in dirs if d not in DIRS_IGNORE]
-        arquivos_filtrados = [f for f in files if f.strip()]
-        if not arquivos_filtrados:
+
+        for nome_arquivo in files:
+
+            path = Path(root) / nome_arquivo
+
+            if arquivo_valido(path):
+                arquivos.append(path)
+
+    return sorted(arquivos)
+
+
+# =========================================================
+# GERAÇÃO MARKDOWN
+# =========================================================
+
+def gerar_markdown(diretorio: Path) -> None:
+
+    arquivos = listar_arquivos_recursivamente(diretorio)
+
+    if not arquivos:
+        print(f"Nenhum arquivo relevante encontrado em: {diretorio}")
+        return
+
+    caminho_md = diretorio / NOME_DOCUMENTACAO
+
+    with open(caminho_md, "w", encoding="utf-8") as md:
+
+        md.write(f"# Documentação: {diretorio.name}\n\n")
+
+        for arquivo in arquivos:
+
+            extensao = arquivo.suffix.lower()
+
+            # suporte para arquivos sem extensão
+            if arquivo.name == "Dockerfile":
+                linguagem = "dockerfile"
+            elif arquivo.name == "Makefile":
+                linguagem = "makefile"
+            elif arquivo.name == "Jenkinsfile":
+                linguagem = "groovy"
+            else:
+                linguagem = obter_linguagem(extensao)
+
+            relativo = arquivo.relative_to(diretorio)
+
+            try:
+                conteudo = arquivo.read_text(
+                    encoding="utf-8",
+                    errors="ignore"
+                )
+
+            except Exception as e:
+                print(f"Erro lendo {arquivo}: {e}")
+                continue
+
+            md.write(f"## {relativo}\n\n")
+
+            md.write(f"```{linguagem}\n")
+            md.write(conteudo)
+            md.write("\n```\n\n")
+
+    print(f"Gerado: {caminho_md}")
+
+
+# =========================================================
+# RELATÓRIO DE EXTENSÕES
+# =========================================================
+
+def gerar_relatorio_extensoes(raiz: Path) -> None:
+
+    caminho_saida = raiz / NOME_EXTENSOES
+
+    linhas = []
+
+    for root, dirs, files in os.walk(raiz):
+
+        dirs[:] = [d for d in dirs if d not in DIRS_IGNORE]
+
+        for nome_arquivo in files:
+
+            path = Path(root) / nome_arquivo
+
+            if path.name in {NOME_DOCUMENTACAO, NOME_EXTENSOES}:
+                continue
+
+            extensao = path.suffix.lower() or "[sem_ext]"
+
+            relativo = path.relative_to(raiz)
+
+            linhas.append(f"{extensao} -> {relativo}")
+
+    linhas = sorted(set(linhas))
+
+    with open(caminho_saida, "w", encoding="utf-8") as f:
+        f.write("\n".join(linhas))
+
+    print(f"Gerado: {caminho_saida}")
+
+
+# =========================================================
+# LIMPEZA
+# =========================================================
+
+ARQUIVOS_GERADOS = {
+    NOME_DOCUMENTACAO,
+    NOME_EXTENSOES,
+}
+
+
+def limpar_documentacao(raiz: Path) -> None:
+
+    removidos = 0
+
+    for root, dirs, files in os.walk(raiz):
+
+        dirs[:] = [d for d in dirs if d not in DIRS_IGNORE]
+
+        for nome_arquivo in files:
+
+            if nome_arquivo not in ARQUIVOS_GERADOS:
+                continue
+
+            caminho = Path(root) / nome_arquivo
+
+            try:
+                caminho.unlink()
+
+                removidos += 1
+
+                print(f"Removido: {caminho}")
+
+            except Exception as e:
+                print(f"Erro removendo {caminho}: {e}")
+
+    print(f"\nTotal removido: {removidos}")
+
+
+# =========================================================
+# MAIN
+# =========================================================
+
+def main() -> None:
+
+    raiz = Path(".").resolve()
+
+    # -----------------------------------------------------
+    # LIMPEZA
+    # -----------------------------------------------------
+
+    if len(sys.argv) > 1 and sys.argv[1].lower() == "limpar":
+
+        print(f"Limpando documentação em: {raiz}")
+
+        limpar_documentacao(raiz)
+
+        return
+
+    # -----------------------------------------------------
+    # GERAÇÃO
+    # -----------------------------------------------------
+
+    print(f"Processando raiz: {raiz}")
+
+    # documentação da raiz
+    gerar_markdown(raiz)
+
+    # documentação dos diretórios imediatos
+    for item in raiz.iterdir():
+
+        if not item.is_dir():
             continue
 
-        rel_dir = os.path.relpath(root, projeto_dir)
-        titulo_dir = f"## {rel_dir}\n\n"
+        if item.name in DIRS_IGNORE:
+            continue
 
-        if unico:
-            if conteudo_unico:
-                conteudo_unico.append("---\n\n")
-            conteudo_unico.append(titulo_dir)
-            dir_slug = slugify(rel_dir)
-            indice.append(f"- [{rel_dir}](#{dir_slug})\n")
-        else:
-            caminho_md = os.path.join(root, NOME_ARQUIVO_MD)
-            md_por_diretorio.append(os.path.relpath(caminho_md, projeto_dir))
-            with open(caminho_md, "w", encoding="utf-8") as destino:
-                destino.write(titulo_dir)
-                for arquivo in arquivos_filtrados:
-                    caminho_arquivo = os.path.join(root, arquivo)
-                    if not is_text_file(caminho_arquivo):
-                        continue
-                    ext = os.path.splitext(arquivo)[1]
-                    linguagem, tipo_comentario = inferir_linguagem(ext)
-                    caminho_relativo = os.path.relpath(caminho_arquivo, projeto_dir)
-                    try:
-                        with open(caminho_arquivo, "r", encoding="utf-8", errors="ignore") as f:
-                            conteudo = f.read()
-                    except Exception as e:
-                        print(f"Erro lendo {caminho_arquivo}: {e}")
-                        continue
-                    comentario_inicio = f"<!-- {caminho_relativo} -->" if tipo_comentario in ["block",
-                                                                                              "<!-- -->"] else f"{tipo_comentario} {caminho_relativo}"
-                    bloco = f"### {arquivo}\n\n```{linguagem}\n{comentario_inicio}\n{conteudo}\n```\n\n"
-                    destino.write(bloco)
-            print(f"Gerado .md por diretório: {caminho_md}")
+        gerar_markdown(item)
 
-        if unico:
-            for arquivo in arquivos_filtrados:
-                caminho_arquivo = os.path.join(root, arquivo)
-                if not is_text_file(caminho_arquivo):
-                    continue
-                ext = os.path.splitext(arquivo)[1]
-                linguagem, tipo_comentario = inferir_linguagem(ext)
-                caminho_relativo = os.path.relpath(caminho_arquivo, projeto_dir)
-                try:
-                    with open(caminho_arquivo, "r", encoding="utf-8", errors="ignore") as f:
-                        conteudo = f.read()
-                except Exception as e:
-                    print(f"Erro lendo {caminho_arquivo}: {e}")
-                    continue
-                comentario_inicio = f"<!-- {caminho_relativo} -->" if tipo_comentario in ["block",
-                                                                                          "<!-- -->"] else f"{tipo_comentario} {caminho_relativo}"
-                bloco = f"### {arquivo}\n\n```{linguagem}\n{comentario_inicio}\n{conteudo}\n```\n\n"
-                conteudo_unico.append(bloco)
-                arquivo_slug = slugify(os.path.join(rel_dir, arquivo))
-                indice.append(f"  - [{arquivo}](#{arquivo_slug})\n")
+    # relatório central de extensões
+    gerar_relatorio_extensoes(raiz)
 
-    if unico:
-        caminho_md = os.path.join(projeto_dir, NOME_ARQUIVO_MD)
-        with open(caminho_md, "w", encoding="utf-8") as f:
-            f.write(f"# Documentação do projeto {os.path.basename(projeto_dir)}\n\n")
-            if indice:
-                f.write("## Índice de Diretórios e Arquivos\n\n")
-                f.writelines(indice)
-                f.write("\n")
-            f.writelines(conteudo_unico)
-        print(f"Gerado .md único do projeto: {caminho_md}")
-
-    return conteudo_unico, indice, md_por_diretorio
-
-
-def gerar_readme(projeto_dir, md_por_diretorio):
-    """Gera README.md na raiz do microsserviço com links para todos os MDs"""
-    caminho_readme = os.path.join(projeto_dir, "README-MENU.md")
-    with open(caminho_readme, "w", encoding="utf-8") as f:
-        f.write(f"# README do projeto {os.path.basename(projeto_dir)}\n\n")
-        f.write("## Documentação por diretórios\n\n")
-        for md in md_por_diretorio:
-            f.write(f"- [{md}]({md})\n")
-    print(f"Gerado README-MENU.md em: {caminho_readme}")
-
-
-def limpar_documentacao(raiz):
-    """
-    Apaga apenas os arquivos gerados pelo script:
-    - DOCUMENTACAO.md
-    - DOCUMENTACAO_TODOS_MICROSSERVICOS.md
-    """
-    for root, dirs, files in os.walk(raiz):
-        dirs[:] = [d for d in dirs if d not in DIRS_IGNORE]
-        for f in files:
-            if f == NOME_ARQUIVO_MD or f == NOME_ARQUIVO_MD_CENTRAL:
-                caminho = os.path.join(root, f)
-                try:
-                    os.remove(caminho)
-                    print(f"Removido: {caminho}")
-                except Exception as e:
-                    print(f"Erro removendo {caminho}: {e}")
-
-
-def main():
-    # Se chamado com "limpar", executa apenas limpeza
-    if len(sys.argv) > 1 and sys.argv[1] == "limpar":
-        raiz = sys.argv[2] if len(sys.argv) > 2 else "."
-        raiz = os.path.abspath(raiz)
-        print(f"🗑 Limpando arquivos de documentação em: {raiz}")
-        limpar_documentacao(raiz)
-        sys.exit(0)
-
-    raiz = sys.argv[1] if len(sys.argv) > 1 else "."
-    raiz = os.path.abspath(raiz)
-    conteudo_total = []
-    indice_total = []
-
-    for item in sorted(os.listdir(raiz)):
-        item_path = os.path.join(raiz, item)
-        if os.path.isdir(item_path) and item not in DIRS_IGNORE:
-            print(f"\nProcessando microsserviço/projeto: {item_path}\n")
-            _, _, md_por_diretorio = gerar_documentacao_diretorio(item_path, unico=False)
-            conteudo_projeto, indice_projeto, _ = gerar_documentacao_diretorio(item_path, unico=True)
-            gerar_readme(item_path, md_por_diretorio)
-            conteudo_total.append(f"# Projeto: {item}\n\n")
-            indice_total.append(f"- Projeto: {item}\n")
-            indice_total.extend([f"  {linha}" for linha in indice_projeto])
-            indice_total.append("\n")
-            conteudo_total.extend(conteudo_projeto)
-            conteudo_total.append("\n---\n\n")
-
-    caminho_md_central = os.path.join(raiz, NOME_ARQUIVO_MD_CENTRAL)
-    with open(caminho_md_central, "w", encoding="utf-8") as f:
-        f.write("# Documentação Centralizada de Todos os Microsserviços\n\n")
-        if indice_total:
-            f.write("## Índice de Projetos, Diretórios e Arquivos\n\n")
-            f.writelines(indice_total)
-            f.write("\n")
-        f.writelines(conteudo_total)
-    print(f"\n📄 Documentação centralizada gerada em: {caminho_md_central}")
+    print("\nProcessamento concluído.")
 
 
 if __name__ == "__main__":
     main()
+
