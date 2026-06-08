@@ -264,3 +264,177 @@ seus respectivos alertas. A atualização dos cruzamentos com imóveis rurais n�
 
  ---
 
+Por meio da ferramenta postman, encontrei publicação do mapbiomas. Esta ferramenta nos permitirá realizar estes
+exploratórios nos alertas disponibilizados e planejar integrações com maior agilidade do que se ficassemos navegando
+página por página no mapbiomas e abrindo cada arquivo para ver as propriedades.
+
+![img_8.png](img_8.png)
+
+
+
+
+
+----
+
+## Plugin QGIS - MapBiomas
+
+Encontrei três opções:
+
+![img_13.png](img_13.png)
+
+![img_9.png](img_9.png)
+
+![img_10.png](img_10.png)
+
+![img_11.png](img_11.png)
+
+O meu qgis está na versão 3.44.11-Solothurn
+
+![img_14.png](img_14.png)
+
+![img_15.png](img_15.png)
+
+![img_16.png](img_16.png)
+
+Solicitou o login:
+
+![img_17.png](img_17.png)
+
+Login com sucesso! Apareceu nas layers opções para consultar os alertas:
+
+![img_18.png](img_18.png)
+
+Fiz um filtro pelos alertas no estado do Pará:
+
+![img_19.png](img_19.png)
+
+No mês de junho de 2026, não encontrou nenhum. Refinei a busca para buscar no último ano e apareceram muitos alertas.
+Veja imagem. Ocultei a layer do Brasil para facilidar a visão. Cada pontino vermelho é um alerta.
+
+![img_20.png](img_20.png)
+
+Navegando pela tabela de atributos:
+
+![img_22.png](img_22.png)
+
+Clique duas vezes no ID do alerta ou no ID do CAR para acessar seu relatório.
+
+Após o duplo clique no código de alerta 1451341, apriu a página web do laudo do alerta. Veja:
+
+![img_23.png](img_23.png)
+
+Vou imprimir em pdf e guardar como evidência para o relatório da pesquisa.
+
+![img_21.png](img_21.png)
+
+
+
+
+
+---
+
+## Programa BRASIL MAIS (Polícia Federal) Meio Ambiente Integrado e Seguro
+
+
+A Plataforma Web permite o acesso e compartilhamento das imagens de satélites diárias adquiridas pela constelação PlanetScope, composta por centenas de nano satélites, fornecidas no âmbito do contrato n° 026/2025 celebrado entre Polícia Federal e a SCCON Geospatial.
+O compartilhamento das imagens por meio da Plataforma Web visa contribuir para que o acesso e a utilização dos produtos fornecidos sejam potencializados e compartilhados entre as instituições e milhares de usuários públicos de todo Brasil cadastrados na Plataforma a partir de termo de adesão ao Programa Brasil M.A.I.S. a ser firmado junto ao Ministério da Justiça e Segurança Pública pelas respectivas instituições públicas.
+ 
++ NÚMEROS DA PLATAFORMA
+    8.5
+    MILHÕES DE KM²
+    imageados diariamente
+
+    130
+    SATÉLITES PLANET
+    (aproximadamente)
+    cobrindo diariamente o Brasil
+
+    729
+    INSTITUIÇÕES
+    cadastradas no Programa
+
+
+CLASSES DE ALERTAS
+
+- Cicatriz de Queimadas;
+- Desmatamento - Acesso;
+- Desmatamento - Corte Raso
+- Desmatamento - Degradação;
+- Desmatamento - Degradação - Agente Químico;
+- Desmatamento - Degradação - Corte Seletivo;
+- Desmatamento - Extração de Mineral/Garimpo;
+- Embarcações - Outros;
+- Embarcações - Balsa;
+- Embarcações - Draga;
+- Foco de Queimada;
+- Foco de Queimada (IA)
+- Pista de Pouso - Expansão;
+- Pista de Pouso - Abertura;
+- Pista de Pouso - Reativação;
+- Supressão por causas naturais - Blowdown;
+- Supressão por causas naturais - Deslizamentos;
+- Supressão por causas naturais - Erosão Fluvial
+- Detecção Mensal de Construções - Experimental;
+- Detecção Mensal de Estradas - Experimental;
+
+![img_24.png](img_24.png)
+
+Assim como o MapBiomas o Brasil Mais também tem plugin para o qgis:
+
+![img_25.png](img_25.png)
+
+### IMAGENS DIÁRIAS E MOSAICOS PLANET
+
+Com centenas de satélites em órbita, a Planet é capaz de revisitar diariamente, com o mesmo tipo de sensor de alta
+resolução, todo o território nacional, o que garante o imageamento completo com os mais baixos índices de cobertura de
+nuvens e o monitoramento detalhado das mudanças.
+As imagens dos satélites Planet são obtidas pela constelação de satélites Dove e SuperDove, que possuem até 8 bandas
+espectrais e resolução radiométrica de 12 bits. Estas imagens, conhecidas como PlanetScope, são disponibilizadas
+ortorretificadas com resolução espacial de 3 metros em Plataforma Web ou via API em até 24 horas após a coleta, de forma
+a permitir agilidade na tomada de decisões e apoio às operações de campo.
+
+![img_27.png](img_27.png)
+
+##### Queimadas no estado de Rondônia [ RGB
+
+1
+MAI/22
+2
+JUN/22
+3
+JUL/22
+4
+AGO/22
+5
+SET/22
+6
+OUT/22 ]
+
+Mosaicos mensais Planet - Região entre os estados de Rondônia e Amazonas
+Os mosaicos mensais da Planet são gerados sistematicamente e a partir das imagens diárias PlanetScope coletadas ao longo
+de todo o mês. A partir de processos automáticos, os algoritmos selecionam as melhores imagens para gerar uma informação
+de alta resolução, homogênea, cobrindo todo o território nacional, com a menor presença de nuvens possível.
+Esses mosaicos, disponibilizados mensalmente, são acessíveis por meio de WebServices ou em Plugins QGIS em cores
+naturais (RGB), em composição falsa cor (NIR) e em diferentes índices espectrais, com resolução espacial de 4,77 metros
+e resolução radiométrica de 8 bits.
+Por ser bastante leve para uso em aplicações Web é empregado em diferentes aplicações na contextualização de grandes
+áreas e disponibilizado por meio de “tiles”.
+
+## RELATÓRIO ANALÍTICO DE ALERTAS DE DESMATAMENTO
+
+O Dashboard de Alertas oferece também o Relatório Analítico de Alertas (RAA) de desmatamento, um documento automatizado,
+gerado a partir de cruzamentos espaciais dos alertas de detecção de mudança com diversas camadas geoespaciais de dados
+públicos (Cadastro Ambiental Rural, Terras Indígenas, Unidades de Conservação, Comunidades Quilombolas, entre outras).
+Todas as fontes de dados utilizados pelo Relatório Analítico de Alertas são informadas em cada relatório gerado,
+trazendo objetividade e transparência quanto à fonte das informações utilizadas.
+
+![img_28.png](img_28.png)
+
+Porém solicita autenticação. É necessário avaliar a possibilidade de solicitar acesso para o nosso trabalho.
+
+![img_26.png](img_26.png)
+
+
+----
+
+
